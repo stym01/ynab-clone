@@ -89,7 +89,7 @@ export default function Header({
   const rtaPositive = readyToAssign >= 0
 
   return (
-    <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-between px-6 flex-shrink-0 shadow-sm">
+    <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-start gap-12 px-6 flex-shrink-0 shadow-sm relative z-20">
       
       {/* Left: Month Selector + Notes */}
       <div className="flex items-center gap-3">

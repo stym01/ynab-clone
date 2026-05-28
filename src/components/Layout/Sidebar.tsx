@@ -55,7 +55,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
         initial={false}
         animate={{ width: isCollapsed ? 64 : 260 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="flex flex-col bg-[#1a1c3b] text-white flex-shrink-0 relative z-10 h-full"
+        className="flex flex-col bg-[#232262] text-white flex-shrink-0 relative z-10 h-full"
         style={{ minHeight: '100vh' }}
       >
         {/* Budget Switcher Header */}
