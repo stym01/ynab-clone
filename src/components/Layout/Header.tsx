@@ -98,34 +98,37 @@ export default function Header({
   const rtaPositive = readyToAssign >= 0
 
   return (
-    <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-start gap-12 px-6 flex-shrink-0 shadow-sm relative z-20">
+    <header className="h-[90px] bg-white border-b border-slate-200 flex items-center px-6 flex-shrink-0 shadow-sm relative z-20">
       
       {/* Left: Month Selector + Notes */}
-      <div className="flex items-center gap-3 relative" ref={monthDropdownRef}>
+      <div className="flex items-center gap-4 relative flex-1" ref={monthDropdownRef}>
         <button 
           onClick={handlePrevMonth} 
-          className="p-0.5 rounded-full text-[#5155C3] border-2 border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
+          className="p-1 rounded-full text-[#5155C3] border-[2px] border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
           aria-label="Previous month"
         >
-          <ChevronLeft size={18} strokeWidth={2.5} />
+          <ChevronLeft size={22} strokeWidth={2.5} />
         </button>
         
         <div 
-          className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+          className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => setShowMonthDropdown(!showMonthDropdown)}
         >
-          <h1 className="text-[22px] font-bold text-slate-800 text-center select-none tracking-tight">
-            {readableMonth}
-          </h1>
-          <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-1" />
+          <div className="flex items-center gap-1">
+            <h1 className="text-[26px] font-bold text-slate-800 text-center select-none tracking-tight">
+              {readableMonth}
+            </h1>
+            <ChevronDown size={16} strokeWidth={3} className="text-[#5155C3] mt-1" />
+          </div>
+          <span className="text-[13px] text-slate-500 font-medium pl-1">Enter a note...</span>
         </div>
 
         <button 
           onClick={handleNextMonth} 
-          className="p-0.5 rounded-full text-[#5155C3] border-2 border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
+          className="p-1 rounded-full text-[#5155C3] border-[2px] border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
           aria-label="Next month"
         >
-          <ChevronRight size={18} strokeWidth={2.5} />
+          <ChevronRight size={22} strokeWidth={2.5} />
         </button>
 
         {/* Month Dropdown Popover */}
@@ -180,68 +183,35 @@ export default function Header({
           )}
         </AnimatePresence>
 
-        {/* Month Notes Icon */}
-        <div ref={noteRef} className="relative">
-          <button 
-            onClick={() => setShowMonthNote(!showMonthNote)}
-            className={`p-1.5 rounded-full transition-all ${showMonthNote ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
-            aria-label="Month notes"
-          >
-            <StickyNote size={16} />
-          </button>
-          <AnimatePresence>
-            {showMonthNote && (
-              <motion.div 
-                initial={{ opacity: 0, y: -4, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-4 z-50"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Month Notes</span>
-                  <button onClick={() => setShowMonthNote(false)} className="text-slate-400 hover:text-slate-600">
-                    <X size={14} />
-                  </button>
-                </div>
-                <textarea
-                  value={monthNote}
-                  onChange={(e) => setMonthNote(e.target.value)}
-                  placeholder="Add a note for this month..."
-                  className="w-full h-24 px-3 py-2 text-sm border border-slate-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87]"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </div>
 
       {/* Center: Ready To Assign Pill (Clickable → Breakdown) */}
-      <div ref={rtaRef} className="relative">
+      <div ref={rtaRef} className="relative flex justify-center flex-1">
         <div className={`
-          flex items-center justify-between pl-6 pr-2 py-1.5 rounded-[20px]
-          transition-all
+          flex items-center justify-between pl-5 pr-2 py-2 rounded-[14px]
+          transition-all min-w-[280px] h-[65px]
           ${rtaPositive 
-            ? 'bg-[#98E85B] shadow-sm' 
+            ? 'bg-[#BAF45A] shadow-sm' 
             : 'bg-[#E54545] shadow-sm'
           }
         `}>
-          <div className="flex flex-col items-start pr-8 cursor-pointer" onClick={() => setShowRTABreakdown(!showRTABreakdown)}>
-            <div className={`text-[22px] font-bold tracking-tight leading-none mb-0.5 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
+          <div className="flex flex-col items-start pr-12 cursor-pointer" onClick={() => setShowRTABreakdown(!showRTABreakdown)}>
+            <div className={`text-[22px] font-bold tracking-tight leading-none mb-1 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
               {formatCurrency(readyToAssign)}
             </div>
-            <div className={`text-xs font-medium opacity-90 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
+            <div className={`text-[13px] font-semibold opacity-90 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
               Ready to Assign
             </div>
           </div>
-          <div ref={autoRef} className="relative">
+          <div ref={autoRef} className="relative h-full flex items-center">
             <button 
               onClick={(e) => { e.stopPropagation(); setShowAutoAssign(!showAutoAssign); }}
               className={`
-                flex items-center gap-1 px-4 py-1.5 rounded-2xl font-bold text-sm transition-colors
-                ${rtaPositive ? 'bg-[#549320] hover:bg-[#437519] text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
+                flex items-center justify-center gap-2 px-5 h-[42px] rounded-[10px] font-bold text-[15px] transition-colors shadow-sm
+                ${rtaPositive ? 'bg-[#508B1C] hover:bg-[#3D6B15] text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
               `}
             >
-              Assign <ChevronDown size={14} className={`transition-transform ${showAutoAssign ? 'rotate-180' : ''}`} />
+              Assign <ChevronDown size={14} className={`transition-transform ml-1 ${showAutoAssign ? 'rotate-180' : ''}`} />
             </button>
             <AnimatePresence>
               {showAutoAssign && (
@@ -316,6 +286,8 @@ export default function Header({
           )}
         </AnimatePresence>
       </div>
+      {/* Right spacer */}
+      <div className="flex-1"></div>
     </header>
   )
 }

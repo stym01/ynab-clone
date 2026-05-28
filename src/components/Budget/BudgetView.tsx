@@ -5,6 +5,7 @@ import BudgetTable from "./BudgetTable"
 import MoveMoneyModal from "./MoveMoneyModal"
 import Inspector from "./Inspector"
 import Header from "@/components/Layout/Header"
+import { Filter, PlusCircle, Undo2, Redo2, History, List, AlignJustify } from "lucide-react"
 import { updateCategoryAssigned, updateCategoryTarget, moveMoney } from "@/app/actions/budget"
 
 interface BudgetViewProps {
@@ -275,8 +276,45 @@ export default function BudgetView({
         />
       )}
       <div className="flex flex-col flex-1 border-r border-slate-200 overflow-y-auto">
+        {/* Filters Row */}
+        <div className="bg-white px-6 pt-3 pb-2 flex items-center gap-3">
+          <button 
+            onClick={() => setActiveFilter('all')}
+            className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'all' ? 'bg-[#EEF2FC] border-[#5155C3]/30 text-[#5155C3]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
+          >
+            All
+          </button>
+          <button 
+            onClick={() => setActiveFilter('underfunded')}
+            className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'underfunded' ? 'bg-orange-50 border-orange-200 text-[#E8A317]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
+          >
+            Underfunded
+          </button>
+          <button 
+            onClick={() => setActiveFilter('overspent')}
+            className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'overspent' ? 'bg-red-50 border-red-200 text-[#E54545]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
+          >
+            Overfunded
+          </button>
+          <button 
+            onClick={() => setActiveFilter('available')}
+            className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'available' ? 'bg-green-50 border-green-200 text-[#23B573]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
+          >
+            Money Available
+          </button>
+          <button 
+            className="px-4 py-1.5 text-[13px] font-bold rounded-lg border bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors"
+          >
+            Snoozed
+          </button>
+          <button className="p-1 text-[#5155C3] rounded-full border border-[#5155C3]/30 hover:bg-[#EEF2FC] transition-colors ml-1 bg-white">
+            <Filter size={14} />
+          </button>
+        </div>
+
+        {/* Toolbar Row */}
         <div className="flex justify-between items-center px-6 py-3 border-b border-slate-200 bg-white">
-          <div className="flex gap-2">
+          <div className="flex gap-4 items-center">
             <button 
               onClick={async () => {
                 const name = window.prompt("Enter new category group name:")
@@ -288,57 +326,37 @@ export default function BudgetView({
                   }
                 }
               }}
-              className="px-3 py-1.5 text-sm font-medium text-[#005A87] bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors shadow-sm"
+              className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5"
             >
-              + Category Group
+              <PlusCircle size={16} className="fill-[#5155C3] text-white" /> Category Group
             </button>
-            <div className="border-l border-slate-200 mx-2"></div>
             <button 
               onClick={handleUndo}
               disabled={past.length === 0}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+              className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Undo
+              <Undo2 size={16} /> Undo
             </button>
             <button 
               onClick={handleRedo}
               disabled={future.length === 0}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+              className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Redo
+              <Redo2 size={16} /> Redo
             </button>
             <button 
-              onClick={() => { setMoveMoneyInitialFrom(undefined); setIsMoveMoneyOpen(true); }}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-[#005A87] rounded-md hover:bg-[#004566] transition-colors shadow-sm"
+              className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5"
             >
-              Move Money
+              <History size={16} /> Recent Moves
             </button>
           </div>
           
-          <div className="flex bg-slate-100 p-1 rounded-lg">
-            <button 
-              onClick={() => setActiveFilter('all')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'all' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              All
+          <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 shadow-sm">
+            <button className="px-2.5 py-1.5 bg-[#E4E4E0] shadow-sm rounded-md text-slate-600">
+              <AlignJustify size={16} />
             </button>
-            <button 
-              onClick={() => setActiveFilter('underfunded')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'underfunded' ? 'bg-white shadow text-[#E8A317]' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              Underfunded
-            </button>
-            <button 
-              onClick={() => setActiveFilter('overspent')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'overspent' ? 'bg-white shadow text-[#E54545]' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              Overspent
-            </button>
-            <button 
-              onClick={() => setActiveFilter('available')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'available' ? 'bg-white shadow text-[#23B573]' : 'text-slate-500 hover:text-slate-700'}`}
-            >
-              Money Available
+            <button className="px-2.5 py-1.5 rounded-md text-slate-400 hover:text-slate-600 transition-colors">
+              <List size={16} />
             </button>
           </div>
         </div>
