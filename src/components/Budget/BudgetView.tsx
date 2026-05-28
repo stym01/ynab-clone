@@ -50,7 +50,11 @@ export default function BudgetView({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (!e.target.classList.contains('assigned-input')) {
+          return
+        }
+      }
       
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault()

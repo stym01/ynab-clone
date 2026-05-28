@@ -19,7 +19,6 @@ export default function BudgetTable({
   groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick 
 }: BudgetTableProps) {
   
-  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState<string>("")
   const [contextMenu, setContextMenu] = useState<{ type: 'category' | 'group', id: string, x: number, y: number } | null>(null)
   const [addingCategoryGroupId, setAddingCategoryGroupId] = useState<string | null>(null)
@@ -31,16 +30,45 @@ export default function BudgetTable({
     setGroups(groups.map((g: any) => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g))
   }
 
-  const startEditing = (e: React.MouseEvent, categoryId: string, currentAssigned: number) => {
-    e.stopPropagation()
-    setEditingCategoryId(categoryId)
-    setEditValue((currentAssigned / 100).toFixed(2))
-    onSelectCategory(categoryId)
-  }
+  const prevSelectedCategoryId = React.useRef(selectedCategoryId)
+  
+  React.useEffect(() => {
+    if (selectedCategoryId !== prevSelectedCategoryId.current) {
+      prevSelectedCategoryId.current = selectedCategoryId
+      if (selectedCategoryId) {
+        let foundCategory = null
+        for (const g of groups) {
+          const cat = g.categories.find((c: any) => c.id === selectedCategoryId)
+          if (cat) { foundCategory = cat; break; }
+        }
+        if (foundCategory) {
+          setEditValue((foundCategory.assigned / 100).toFixed(2))
+        }
+      }
+    }
+  }, [selectedCategoryId, groups])
 
   const handleEditSubmit = async (categoryId: string) => {
-    const newAssignedCents = Math.round(parseFloat(editValue || "0") * 100)
-    setEditingCategoryId(null)
+    let finalValue = editValue
+    
+    // Evaluate math expression
+    try {
+      const cleanExpr = editValue.replace(/[^\d.+\-*/()]/g, '')
+      if (cleanExpr) {
+        // eslint-disable-next-line no-eval
+        const result = new Function('return ' + cleanExpr)()
+        if (typeof result === 'number' && !isNaN(result)) {
+          finalValue = result.toString()
+        }
+      }
+    } catch (e) {
+      // Ignore evaluation errors
+    }
+
+    const newAssignedCents = Math.round(parseFloat(finalValue || "0") * 100)
+    if (categoryId === selectedCategoryId) {
+      setEditValue((newAssignedCents / 100).toFixed(2))
+    }
     await onUpdateAssigned(categoryId, newAssignedCents)
   }
 
@@ -48,7 +76,14 @@ export default function BudgetTable({
     if (e.key === "Enter") {
       handleEditSubmit(categoryId)
     } else if (e.key === "Escape") {
-      setEditingCategoryId(null)
+      let foundCategory = null
+      for (const g of groups) {
+        const cat = g.categories.find((c: any) => c.id === selectedCategoryId)
+        if (cat) { foundCategory = cat; break; }
+      }
+      if (foundCategory) {
+        setEditValue((foundCategory.assigned / 100).toFixed(2))
+      }
     }
   }
 
@@ -247,20 +282,27 @@ export default function BudgetTable({
                               )}
                             </div>
                           </td>
-                          <td className="px-5 py-2 text-right" onClick={(e) => startEditing(e, category.id, category.assigned)}>
-                            {editingCategoryId === category.id ? (
-                              <input
-                                autoFocus
-                                type="number"
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(e, category.id)}
-                                onBlur={() => handleEditSubmit(category.id)}
-                                className="w-24 text-right px-2 py-1 border border-[#005A87] rounded-md outline-none focus:ring-2 focus:ring-[#005A87]/20 shadow-sm text-[13px]"
-                                step="0.01"
-                              />
+                          <td className="px-5 py-2 text-right">
+                            {isSelected ? (
+                              <div className="relative inline-flex items-center justify-end w-28">
+                                <div className="absolute left-1.5 top-1.5 text-[9px] text-[#3B42A4] font-mono leading-[9px] pointer-events-none flex flex-col items-center select-none opacity-60">
+                                  <div>+-</div>
+                                  <div>×÷</div>
+                                </div>
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editValue}
+                                  onChange={(e) => setEditValue(e.target.value)}
+                                  onKeyDown={(e) => handleKeyDown(e, category.id)}
+                                  onBlur={() => handleEditSubmit(category.id)}
+                                  onFocus={(e) => e.target.select()}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="assigned-input w-full text-right pl-6 pr-2 py-1 border border-[#3B42A4] rounded outline-none shadow-sm text-[13px] text-[#3B42A4] font-semibold bg-white"
+                                />
+                              </div>
                             ) : (
-                              <div className="inline-block px-2.5 py-0.5 rounded-md hover:bg-slate-100 transition-colors cursor-text text-slate-700 font-medium text-[13px] border border-transparent hover:border-slate-200">
+                              <div className="inline-block px-2.5 py-0.5 rounded-md transition-colors cursor-text text-slate-700 font-medium text-[13px] border border-transparent">
                                 {formatCurrency(category.assigned)}
                               </div>
                             )}
