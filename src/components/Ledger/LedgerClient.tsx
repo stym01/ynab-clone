@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { createTransaction, toggleTransactionCleared, deleteTransaction, flagTransaction } from "@/app/actions/accounts"
+import { createTransaction, toggleTransactionCleared, deleteTransaction, flagTransaction, bulkCategorizeTransactions } from "@/app/actions/accounts"
 import ReconcileModal from "./ReconcileModal"
 import { formatCurrency, CURRENCY_SYMBOL } from "@/lib/currency"
 import { Flag, Trash2, Search, X } from "lucide-react"
@@ -531,7 +531,24 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                     ) : (
                       t.category?.name || (
                         t.amount < 0 
-                          ? <span className="text-red-500 font-semibold flex items-center gap-1">⚠️ Category Needed</span>
+                          ? (
+                              <select 
+                                className="text-[#E54545] font-semibold bg-transparent border border-red-200 rounded px-1 py-0.5 outline-none hover:bg-red-50 cursor-pointer w-full max-w-[160px] truncate transition-colors"
+                                onChange={async (e) => {
+                                  if (e.target.value) {
+                                    await bulkCategorizeTransactions([t.id], e.target.value)
+                                  }
+                                }}
+                                value=""
+                              >
+                                <option value="" disabled>⚠️ Category Needed</option>
+                                {Object.entries(categoriesByGroup).map(([groupId, cats]: [string, any]) => (
+                                  <optgroup key={groupId} label={cats[0].group?.name || 'Group'}>
+                                    {cats.map((c: any) => <option key={c.id} value={c.id} className="text-slate-800 font-normal">{c.name}</option>)}
+                                  </optgroup>
+                                ))}
+                              </select>
+                            )
                           : <span className="text-slate-400 italic">Ready to Assign</span>
                       )
                     )}
