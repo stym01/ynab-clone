@@ -164,12 +164,51 @@ export default function Header({
               Ready to Assign
             </div>
           </div>
-          <button className={`
-            flex items-center gap-1 px-4 py-1.5 rounded-2xl font-bold text-sm transition-colors
-            ${rtaPositive ? 'bg-[#549320] hover:bg-[#437519] text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
-          `}>
-            Assign <ChevronDown size={14} />
-          </button>
+          <div ref={autoRef} className="relative">
+            <button 
+              onClick={(e) => { e.stopPropagation(); setShowAutoAssign(!showAutoAssign); }}
+              className={`
+                flex items-center gap-1 px-4 py-1.5 rounded-2xl font-bold text-sm transition-colors
+                ${rtaPositive ? 'bg-[#549320] hover:bg-[#437519] text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
+              `}
+            >
+              Assign <ChevronDown size={14} className={`transition-transform ${showAutoAssign ? 'rotate-180' : ''}`} />
+            </button>
+            <AnimatePresence>
+              {showAutoAssign && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                  className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => { onAutoAssignUnderfunded?.(); setShowAutoAssign(false) }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-[#005A87] transition-colors"
+                  >
+                    <div className="font-semibold flex items-center gap-2"><Sparkles size={14} /> Underfunded</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Fill all categories up to their targets</div>
+                  </button>
+                  <button
+                    onClick={() => { onAutoAssignLastMonth?.(); setShowAutoAssign(false) }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-[#005A87] transition-colors"
+                  >
+                    <div className="font-semibold">Assigned Last Month</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Match what you assigned last month</div>
+                  </button>
+                  <div className="border-t border-slate-100 mx-3 my-1"></div>
+                  <button
+                    onClick={() => { onResetAssigned?.(); setShowAutoAssign(false) }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-[#005A87] transition-colors"
+                  >
+                    <div className="font-semibold">Reset All Assigned</div>
+                    <div className="text-xs text-slate-400 mt-0.5">Set all categories to ₹0.00 this month</div>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* RTA Breakdown Popover */}
@@ -204,52 +243,6 @@ export default function Header({
                   </span>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Right: Auto-Assign Dropdown */}
-      <div ref={autoRef} className="relative">
-        <button
-          onClick={() => setShowAutoAssign(!showAutoAssign)}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-[#005A87] bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-all active:scale-[0.98] shadow-sm"
-        >
-          <Sparkles size={14} />
-          Auto-Assign
-          <ChevronDown size={14} className={`transition-transform ${showAutoAssign ? 'rotate-180' : ''}`} />
-        </button>
-
-        <AnimatePresence>
-          {showAutoAssign && (
-            <motion.div
-              initial={{ opacity: 0, y: -4, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.95 }}
-              className="absolute top-full right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-slate-200 py-2 z-50"
-            >
-              <button
-                onClick={() => { onAutoAssignUnderfunded?.(); setShowAutoAssign(false) }}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-[#005A87] transition-colors"
-              >
-                <div className="font-semibold">Underfunded</div>
-                <div className="text-xs text-slate-400 mt-0.5">Fill all categories up to their targets</div>
-              </button>
-              <button
-                onClick={() => { onAutoAssignLastMonth?.(); setShowAutoAssign(false) }}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-[#005A87] transition-colors"
-              >
-                <div className="font-semibold">Assigned Last Month</div>
-                <div className="text-xs text-slate-400 mt-0.5">Match what you assigned last month</div>
-              </button>
-              <div className="border-t border-slate-100 mx-3 my-1"></div>
-              <button
-                onClick={() => { onResetAssigned?.(); setShowAutoAssign(false) }}
-                className="w-full text-left px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-blue-50 hover:text-[#005A87] transition-colors"
-              >
-                <div className="font-semibold">Reset All Assigned</div>
-                <div className="text-xs text-slate-400 mt-0.5">Set all categories to ₹0.00 this month</div>
-              </button>
             </motion.div>
           )}
         </AnimatePresence>
