@@ -10,9 +10,10 @@ interface InspectorProps {
   onUpdateAssigned: (categoryId: string, amount: number) => Promise<void>
   onUpdateTarget: (categoryId: string, targetType: string, target: number) => Promise<void>
   groups?: any[]
+  month?: string
 }
 
-export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarget, groups = [] }: InspectorProps) {
+export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarget, groups = [], month }: InspectorProps) {
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [editTargetType, setEditTargetType] = useState("NEEDED_FOR_SPENDING")
   const [editTargetAmount, setEditTargetAmount] = useState("")
@@ -27,50 +28,46 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
     const totalAvailable = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.available, 0), 0)
     const totalUnderfunded = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + Math.max(0, (c.target || 0) - c.available), 0), 0)
 
-    const handleAutoAssignAllUnderfunded = () => {
-      groups.forEach(g => {
-        g.categories.forEach((c: any) => {
-          const under = Math.max(0, (c.target || 0) - c.available)
-          if (under > 0) {
-            onUpdateAssigned(c.id, c.assigned + under)
-          }
-        })
-      })
-    }
+    const totalTargets = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + (c.target || 0), 0), 0)
+
+    const dateObj = new Date((month || "2026-05") + "-01T00:00:00")
+    const readableMonth = dateObj.toLocaleDateString('en-US', { month: 'long' })
 
     return (
-      <div className="flex flex-col h-full bg-slate-50">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold text-slate-800 mb-6">Month Summary</h2>
+      <div className="flex flex-col h-full bg-slate-50 p-4">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <button className="flex items-center gap-2 text-lg font-bold text-slate-800 mb-5 hover:text-slate-600 transition-colors">
+            {readableMonth}'s Summary <ChevronDown size={18} strokeWidth={2.5} className="mt-0.5"/>
+          </button>
           
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-4 mb-6">
-            <h3 className="text-xs font-bold tracking-widest text-slate-400 uppercase mb-3">Auto-Assign</h3>
-            <button 
-              onClick={handleAutoAssignAllUnderfunded}
-              disabled={totalUnderfunded === 0}
-              className="w-full flex justify-between items-center px-4 py-2.5 bg-blue-50 text-[#005A87] border border-blue-200 rounded-md font-semibold hover:bg-blue-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Underfunded
-              <span>{formatCurrency(totalUnderfunded)}</span>
-            </button>
-            <p className="text-xs text-slate-500 mt-2 text-center">
-              Assign money to all underfunded categories at once.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 mb-6 pb-6 border-b border-slate-200">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Total Budgeted</span>
+              <span className="text-slate-600 font-medium">Left Over from Last Month</span>
+              <span className="font-semibold text-slate-800">{formatCurrency(0)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600 font-medium">Assigned in {readableMonth}</span>
               <span className="font-semibold text-slate-800">{formatCurrency(totalBudgeted)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Total Activity</span>
+              <span className="text-slate-600 font-medium">Activity</span>
               <span className="font-semibold text-slate-800">{formatCurrency(totalActivity)}</span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-slate-600">Total Available</span>
+            <div className="flex justify-between text-sm mt-3">
+              <span className="text-slate-800 font-medium">Available</span>
               <span className="font-semibold text-slate-800">{formatCurrency(totalAvailable)}</span>
             </div>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            <h3 className="text-[15px] font-medium text-slate-800">Cost to Be Me</h3>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600 font-medium">{readableMonth}'s Targets</span>
+              <span className="font-semibold text-slate-800">{formatCurrency(totalTargets)}</span>
+            </div>
+            <button className="w-full py-2 px-4 bg-[#EEF2FC] text-[#5155C3] rounded-lg text-[15px] font-medium hover:bg-[#E5EAF5] transition-colors mt-2">
+              Enter your expected income
+            </button>
           </div>
         </div>
       </div>

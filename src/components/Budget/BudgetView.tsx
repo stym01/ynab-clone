@@ -378,6 +378,7 @@ export default function BudgetView({
           onUpdateAssigned={handleUpdateAssigned}
           onUpdateTarget={handleUpdateTarget}
           groups={groups}
+          month={month}
         />
         </div>
       </div>
