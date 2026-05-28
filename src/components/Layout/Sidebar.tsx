@@ -146,7 +146,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
             animate={{ opacity: 1 }}
             className="flex-1 flex flex-col overflow-y-auto"
           >
-            {/* Budget Accounts Section */}
+            {/* Bank Accounts Section */}
             <div className="mt-4">
               <button 
                 onClick={() => setShowBudgetAccounts(!showBudgetAccounts)}
@@ -154,7 +154,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
               >
                 <span className="flex items-center gap-1.5">
                   <ChevronDown size={12} className={`transition-transform duration-200 ${showBudgetAccounts ? '' : '-rotate-90'}`} />
-                  Budget
+                  Bank Accounts
                 </span>
                 <span>{formatCurrency(budgetTotal)}</span>
               </button>
