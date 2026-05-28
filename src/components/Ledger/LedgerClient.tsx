@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { createTransaction, toggleTransactionCleared, deleteTransaction, flagTransaction, bulkCategorizeTransactions } from "@/app/actions/accounts"
+import { createTransaction, toggleTransactionCleared, deleteTransaction, flagTransaction, bulkCategorizeTransactions, updateTransaction } from "@/app/actions/accounts"
 import ReconcileModal from "./ReconcileModal"
 import { formatCurrency, CURRENCY_SYMBOL } from "@/lib/currency"
 import { Flag, Trash2, Search, X } from "lucide-react"
@@ -136,6 +136,50 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
   const [outflow, setOutflow] = useState("")
   const [inflow, setInflow] = useState("")
   const [splits, setSplits] = useState([{ categoryId: "", memo: "", amount: "" }, { categoryId: "", memo: "", amount: "" }])
+
+  // Edit transaction state
+  const [editingTransactionId, setEditingTransactionId] = useState<string | null>(null)
+  const [editDate, setEditDate] = useState("")
+  const [editPayeeName, setEditPayeeName] = useState("")
+  const [editCategoryId, setEditCategoryId] = useState("")
+  const [editMemo, setEditMemo] = useState("")
+  const [editOutflow, setEditOutflow] = useState("")
+  const [editInflow, setEditInflow] = useState("")
+  const [isEditSaving, setIsEditSaving] = useState(false)
+
+  const startEditing = (t: any) => {
+    if (t.subTransactions && t.subTransactions.length > 0) return // Editing splits not supported in inline yet
+    setEditingTransactionId(t.id)
+    setEditDate(new Date(t.date).toISOString().split('T')[0])
+    setEditPayeeName(t.payee?.name || "")
+    setEditCategoryId(t.category?.id || (t.amount >= 0 ? "READY" : ""))
+    setEditMemo(t.memo || "")
+    setEditOutflow(t.amount < 0 ? (Math.abs(t.amount) / 100).toFixed(2) : "")
+    setEditInflow(t.amount >= 0 ? (t.amount / 100).toFixed(2) : "")
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingTransactionId) return
+    setIsEditSaving(true)
+    try {
+      const outNum = parseFloat(editOutflow) || 0
+      const inNum = parseFloat(editInflow) || 0
+      const totalAmountCents = Math.round(inNum * 100) - Math.round(outNum * 100)
+      
+      await updateTransaction(editingTransactionId, {
+        date: editDate,
+        payeeName: editPayeeName,
+        categoryId: editCategoryId === "READY" || editCategoryId === "" ? null : editCategoryId,
+        memo: editMemo,
+        amount: totalAmountCents
+      })
+      setEditingTransactionId(null)
+    } catch (e) {
+      console.error("Failed to update transaction", e)
+    } finally {
+      setIsEditSaving(false)
+    }
+  }
 
   const handleSaveTransaction = async () => {
     if (!payeeName) return
@@ -466,13 +510,54 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
             {/* Existing Transactions */}
             {filteredTransactions.map((t: any, index: number) => (
               <React.Fragment key={t.id}>
-                <tr className={`group cursor-pointer transition-all border-b border-slate-50 ${
-                  selectedIds.has(t.id) 
-                    ? 'bg-blue-50/60' 
-                    : index % 2 === 0 
-                      ? 'bg-white hover:bg-slate-50/80' 
-                      : 'bg-[#FAFBFC] hover:bg-slate-50/80'
-                }`}>
+                {editingTransactionId === t.id ? (
+                  <tr className="bg-amber-50/80 border-b border-amber-100 border-l-3 border-l-amber-500 shadow-sm">
+                    <td className="px-3 py-2"></td>
+                    <td className="px-3 py-2"></td>
+                    <td className="px-3 py-2 text-center" onClick={() => toggleTransactionCleared(t.id, !t.cleared)}>
+                      <div className={`w-5 h-5 rounded-full border-2 mx-auto flex items-center justify-center text-[10px] font-bold cursor-pointer ${t.cleared ? 'border-[#23B573] text-[#23B573] bg-[#23B573]/10' : 'border-slate-300 text-slate-300'}`}>{t.cleared ? '✓' : ''}</div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-sm bg-white" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="text" value={editPayeeName} onChange={e => setEditPayeeName(e.target.value)} list="payees-list" placeholder="Payee" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <CategorySelect 
+                        value={editCategoryId}
+                        onChange={(e: any) => setEditCategoryId(e.target.value)}
+                        className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="text" value={editMemo} onChange={e => setEditMemo(e.target.value)} placeholder="Memo" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="number" step="0.01" value={editOutflow} onChange={e => { setEditOutflow(e.target.value); setEditInflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-right bg-white" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <input type="number" step="0.01" value={editInflow} onChange={e => { setEditInflow(e.target.value); setEditOutflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-right bg-white" />
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex gap-1.5 justify-end">
+                        <button onClick={() => setEditingTransactionId(null)} className="px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors">Cancel</button>
+                        <button onClick={handleSaveEdit} disabled={isEditSaving} className="px-3 py-1 text-xs font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition-colors shadow-sm disabled:opacity-50">Save</button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr 
+                    onDoubleClick={() => startEditing(t)}
+                    onContextMenu={(e) => { e.preventDefault(); startEditing(t); }}
+                    className={`group cursor-pointer transition-all border-b border-slate-50 ${
+                      selectedIds.has(t.id) 
+                        ? 'bg-blue-50/60' 
+                        : index % 2 === 0 
+                          ? 'bg-white hover:bg-slate-50/80' 
+                          : 'bg-[#FAFBFC] hover:bg-slate-50/80'
+                    }`}
+                  >
                   {/* Flag */}
                   <td className="px-3 py-2 relative">
                     <button
@@ -564,6 +649,7 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                     {runningBalances[t.id] !== undefined ? formatCurrency(runningBalances[t.id]) : ''}
                   </td>
                 </tr>
+                )}
                 {/* Sub-transactions */}
                 {t.subTransactions?.map((st: any) => (
                   <tr key={st.id} className="bg-slate-50/50 border-b border-slate-50 text-xs">
