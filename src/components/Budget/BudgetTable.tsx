@@ -15,10 +15,15 @@ interface BudgetTableProps {
   onAvailableClick?: (categoryId: string) => void
   onMoveMoney?: (amountCents: number, fromId: string, toId: string) => Promise<void>
   showProgressBars?: boolean
+  checkedCategoryIds?: string[]
+  onCheckCategory?: (categoryId: string) => void
+  onCheckGroup?: (groupId: string) => void
+  onCheckAll?: () => void
 }
 
 export default function BudgetTable({ 
-  groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney, showProgressBars
+  groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney, showProgressBars,
+  checkedCategoryIds, onCheckCategory, onCheckGroup, onCheckAll
 }: BudgetTableProps) {
   
   const [editValue, setEditValue] = useState<string>("")
@@ -211,7 +216,26 @@ export default function BudgetTable({
             <tr>
               <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider w-[40%]">
                 <div className="flex items-center gap-3">
-                  <div className="w-3.5 h-3.5 rounded-[3px] border border-slate-300 flex-shrink-0 bg-white"></div>
+                  <div 
+                    onClick={() => onCheckAll?.()}
+                    className={`w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center transition-colors flex-shrink-0 cursor-pointer ${
+                      (() => {
+                        const allIds = groups.flatMap((g: any) => g.categories.map((c: any) => c.id))
+                        const all = allIds.length > 0 && allIds.every((id: string) => checkedCategoryIds?.includes(id))
+                        const some = allIds.some((id: string) => checkedCategoryIds?.includes(id)) && !all
+                        return all || some ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'
+                      })()
+                    }`}
+                  >
+                    {(() => {
+                      const allIds = groups.flatMap((g: any) => g.categories.map((c: any) => c.id))
+                      const all = allIds.length > 0 && allIds.every((id: string) => checkedCategoryIds?.includes(id))
+                      const some = allIds.some((id: string) => checkedCategoryIds?.includes(id)) && !all
+                      if (all) return <Check size={10} className="text-white" strokeWidth={3} />
+                      if (some) return <Minus size={10} className="text-white" strokeWidth={3} />
+                      return null
+                    })()}
+                  </div>
                   CATEGORY
                 </div>
               </th>
@@ -226,7 +250,10 @@ export default function BudgetTable({
               const groupActivity = group.categories.reduce((sum: number, c: any) => sum + c.activity, 0)
               const groupAvailable = group.categories.reduce((sum: number, c: any) => sum + c.available, 0)
 
-              const hasSelectedChild = group.categories.some((c: any) => c.id === selectedCategoryId)
+
+              const groupCatIds = group.categories.map((c: any) => c.id)
+              const groupAllChecked = groupCatIds.length > 0 && groupCatIds.every((id: string) => checkedCategoryIds?.includes(id))
+              const groupSomeChecked = groupCatIds.some((id: string) => checkedCategoryIds?.includes(id)) && !groupAllChecked
 
               return (
                 <React.Fragment key={group.id}>
@@ -244,8 +271,12 @@ export default function BudgetTable({
                           {group.isExpanded ? <ChevronDown size={14}/> : <ChevronRight size={14}/>}
                         </span>
                         
-                        <div className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 ${hasSelectedChild || selectedCategoryId === group.id ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}>
-                          {(hasSelectedChild || selectedCategoryId === group.id) && <Minus size={10} className="text-white" strokeWidth={3} />}
+                        <div 
+                          onClick={(e) => { e.stopPropagation(); onCheckGroup?.(group.id); }}
+                          className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 cursor-pointer ${groupAllChecked || groupSomeChecked ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}
+                        >
+                          {groupAllChecked && <Check size={10} className="text-white" strokeWidth={3} />}
+                          {groupSomeChecked && <Minus size={10} className="text-white" strokeWidth={3} />}
                         </div>
                         {inlineEditing?.id === group.id && inlineEditing?.type === 'group' ? (
                           <input
@@ -293,6 +324,7 @@ export default function BudgetTable({
                   <AnimatePresence initial={false}>
                     {group.isExpanded && group.categories.map((category: any, catIndex: number) => {
                       const isSelected = selectedCategoryId === category.id
+                      const isChecked = checkedCategoryIds?.includes(category.id)
                       return (
                         <motion.tr 
                           initial={{ opacity: 0, height: 0 }}
@@ -301,7 +333,7 @@ export default function BudgetTable({
                           transition={{ duration: 0.12 }}
                           key={category.id} 
                           className={`cursor-pointer transition-all border-b border-slate-100 group/cat ${
-                            isSelected 
+                            isSelected || isChecked
                               ? "bg-[#EEF2FC]" 
                               : "bg-white hover:bg-slate-50"
                           }`}
@@ -313,8 +345,11 @@ export default function BudgetTable({
                           }}>
                             <div className="flex flex-col gap-1 ml-5">
                               <div className="flex items-center gap-2">
-                                <div className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 ${isSelected ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}>
-                                  {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+                                <div 
+                                  onClick={(e) => { e.stopPropagation(); onCheckCategory?.(category.id); }}
+                                  className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 cursor-pointer ${isChecked ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}
+                                >
+                                  {isChecked && <Check size={10} className="text-white" strokeWidth={3} />}
                                 </div>
                                 <span className="font-medium text-slate-700 flex items-center gap-1.5 text-[13px]">
                                 {inlineEditing?.id === category.id && inlineEditing?.type === 'category' ? (

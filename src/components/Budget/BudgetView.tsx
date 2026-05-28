@@ -26,6 +26,7 @@ export default function BudgetView({
   totalOverspending = 0
 }: BudgetViewProps) {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
+  const [checkedCategoryIds, setCheckedCategoryIds] = useState<string[]>([])
   const [groups, setGroups] = useState(initialData?.categoryGroups || [])
   
   const [isAddingCategoryGroup, setIsAddingCategoryGroup] = useState(false)
@@ -273,6 +274,43 @@ export default function BudgetView({
     }
   }
 
+  const handleCheckCategory = (categoryId: string) => {
+    setCheckedCategoryIds(prev => 
+      prev.includes(categoryId) 
+        ? prev.filter(id => id !== categoryId) 
+        : [...prev, categoryId]
+    )
+  }
+
+  const handleCheckGroup = (groupId: string) => {
+    const group = groups.find((g: any) => g.id === groupId)
+    if (!group) return
+    const groupCatIds = group.categories.map((c: any) => c.id)
+    
+    const allChecked = groupCatIds.every((id: string) => checkedCategoryIds.includes(id))
+    
+    if (allChecked) {
+      setCheckedCategoryIds(prev => prev.filter(id => !groupCatIds.includes(id)))
+    } else {
+      setCheckedCategoryIds(prev => {
+        const newIds = new Set(prev)
+        groupCatIds.forEach((id: string) => newIds.add(id))
+        return Array.from(newIds)
+      })
+    }
+  }
+
+  const handleCheckAll = () => {
+    const allCatIds = groups.flatMap((g: any) => g.categories.map((c: any) => c.id))
+    const allChecked = allCatIds.length > 0 && allCatIds.every((id: string) => checkedCategoryIds.includes(id))
+    
+    if (allChecked) {
+      setCheckedCategoryIds([])
+    } else {
+      setCheckedCategoryIds(allCatIds)
+    }
+  }
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <Header 
@@ -445,6 +483,10 @@ export default function BudgetView({
           onUpdateAssigned={handleUpdateAssigned}
           onMoveMoney={handleMoveMoney}
           showProgressBars={showProgressBars}
+          checkedCategoryIds={checkedCategoryIds}
+          onCheckCategory={handleCheckCategory}
+          onCheckGroup={handleCheckGroup}
+          onCheckAll={handleCheckAll}
           onAvailableClick={(categoryId) => {
             setMoveMoneyInitialFrom(categoryId)
             setIsMoveMoneyOpen(true)
