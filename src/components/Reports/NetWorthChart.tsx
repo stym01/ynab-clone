@@ -20,6 +20,9 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value)
   }
 
+  const currentNetWorth = data.length > 0 ? data[data.length - 1].netWorth : 0
+  const color = currentNetWorth < 0 ? "#E54545" : "#23B573"
+
   return (
     <div className="w-full h-[400px] bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
       <div className="mb-6 flex justify-between items-end">
@@ -29,8 +32,8 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
         </div>
         <div className="text-right">
           <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Current Net Worth</div>
-          <div className="text-3xl font-bold text-[#23B573]">
-            {data.length > 0 ? formatValue(data[data.length - 1].netWorth) : "₹0"}
+          <div className="text-3xl font-bold" style={{ color }}>
+            {formatValue(currentNetWorth)}
           </div>
         </div>
       </div>
@@ -43,8 +46,8 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
           >
             <defs>
               <linearGradient id="colorNetWorth" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#23B573" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#23B573" stopOpacity={0}/>
+                <stop offset="5%" stopColor={color} stopOpacity={0.3}/>
+                <stop offset="95%" stopColor={color} stopOpacity={0}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
@@ -69,7 +72,7 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
             <Area 
               type="monotone" 
               dataKey="netWorth" 
-              stroke="#23B573" 
+              stroke={color} 
               strokeWidth={3}
               fillOpacity={1} 
               fill="url(#colorNetWorth)" 
