@@ -69,6 +69,7 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
               value={type} 
               onChange={e => setType(e.target.value)}
               className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white"
+            >
               <option value="checking">Checking</option>
               <option value="savings">Savings</option>
               <option value="creditCard">Credit Card</option>
