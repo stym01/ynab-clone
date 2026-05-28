@@ -67,11 +67,11 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
       >
-        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-800">Edit Account</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Edit Account</h2>
+          <button onClick={onClose} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 dark:text-slate-400 dark:text-slate-500 transition-colors">
             <X size={20} />
           </button>
         </div>
@@ -79,7 +79,7 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-6">
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-slate-600">Account Nickname</label>
+            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-500">Account Nickname</label>
             <input 
               required
               autoFocus
@@ -91,24 +91,24 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-slate-600 flex items-center justify-between">
+            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-500 flex items-center justify-between">
               Bank Connection
               {syncProvider === "ICICI_GMAIL" && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">LINKED</span>}
             </label>
-            <p className="text-xs text-slate-500 mb-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-1">
               Link your account to your financial institution and import transactions directly from Gmail without ever leaving the app.
             </p>
             <select 
               value={syncProvider} 
               onChange={e => setSyncProvider(e.target.value)}
-              className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white"
+              className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white dark:bg-slate-900"
             >
               <option value="none">Unlinked (Manual entry only)</option>
               <option value="ICICI_GMAIL">ICICI Credit Card (Gmail Sync)</option>
             </select>
           </div>
           
-          <div className="flex justify-between items-center mt-2 pt-4 border-t border-slate-100">
+          <div className="flex justify-between items-center mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
             <div className="flex gap-2">
               <button 
                 type="button" 
@@ -132,7 +132,7 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
               <button 
                 type="button" 
                 onClick={onClose} 
-                className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-md transition-colors"
               >
                 Cancel
               </button>

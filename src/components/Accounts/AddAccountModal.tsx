@@ -40,18 +40,18 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
       >
-        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-800">Add Account</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600 transition-colors">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Add Account</h2>
+          <button onClick={onClose} className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 dark:text-slate-400 dark:text-slate-500 transition-colors">
             <X size={20} />
           </button>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-slate-600">Nickname</label>
+            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-500">Nickname</label>
             <input 
               required
               autoFocus
@@ -64,11 +64,11 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-slate-600">Account Type</label>
+            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-500">Account Type</label>
             <select 
               value={type} 
               onChange={e => setType(e.target.value)}
-              className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white"
+              className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white dark:bg-slate-900"
             >
               <option value="checking">Checking</option>
               <option value="savings">Savings</option>
@@ -78,9 +78,9 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-slate-600">Current Balance</label>
+            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400 dark:text-slate-500">Current Balance</label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">₹</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400 dark:text-slate-500 font-medium">₹</span>
               <input 
                 required
                 type="number" 
@@ -91,14 +91,14 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
                 className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent transition-shadow"
               />
             </div>
-            <p className="text-xs text-slate-500 mt-1">If you owe money, enter a negative amount.</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">If you owe money, enter a negative amount.</p>
           </div>
           
-          <div className="flex justify-end gap-3 mt-2 pt-4 border-t border-slate-100">
+          <div className="flex justify-end gap-3 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
             <button 
               type="button" 
               onClick={onClose} 
-              className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 rounded-md transition-colors"
             >
               Cancel
             </button>

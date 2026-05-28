@@ -26,7 +26,7 @@ export default function AppLayout({ children, accounts = [], budgets = [], activ
   }, [])
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-800 dark:bg-slate-900 overflow-hidden font-sans">
       <Sidebar accounts={accounts} budgets={budgets} activeBudget={activeBudget} externalCollapsed={forceSidebarCollapsed} />
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {children}

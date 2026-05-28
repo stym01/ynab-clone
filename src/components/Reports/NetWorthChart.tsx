@@ -24,14 +24,14 @@ export default function NetWorthChart({ data }: NetWorthChartProps) {
   const color = currentNetWorth < 0 ? "#E54545" : "#23B573"
 
   return (
-    <div className="w-full h-[400px] bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+    <div className="w-full h-[400px] bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
       <div className="mb-6 flex justify-between items-end">
         <div>
-          <h2 className="text-xl font-bold text-slate-800">Net Worth</h2>
-          <p className="text-sm text-slate-500 mt-1">Your total assets minus total debts over time.</p>
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Net Worth</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Your total assets minus total debts over time.</p>
         </div>
         <div className="text-right">
-          <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Current Net Worth</div>
+          <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">Current Net Worth</div>
           <div className="text-3xl font-bold" style={{ color }}>
             {formatValue(currentNetWorth)}
           </div>

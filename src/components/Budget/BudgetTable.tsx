@@ -104,7 +104,7 @@ export default function BudgetTable({
   }
 
   if (!groups || groups.length === 0) {
-    return <div className="p-8 text-slate-500">No groups found.</div>
+    return <div className="p-8 text-slate-500 dark:text-slate-400 dark:text-slate-500">No groups found.</div>
   }
 
   // Available pill color logic
@@ -116,20 +116,20 @@ export default function BudgetTable({
     } else if (category.available < 0) {
       return 'bg-[#E54545] text-white' // Red: overspent
     } else {
-      return 'bg-slate-100 text-slate-500' // Gray: zero
+      return 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 dark:text-slate-500' // Gray: zero
     }
   }
 
   return (
     <>
-      <div className="flex-1 overflow-auto bg-white">
+      <div className="flex-1 overflow-auto bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left whitespace-nowrap">
-          <thead className="sticky top-0 bg-white border-b border-slate-200 z-10">
+          <thead className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 z-10">
             <tr>
-              <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider w-[40%]">Category</th>
-              <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Assigned</th>
-              <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Activity</th>
-              <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Available</th>
+              <th className="px-5 py-2.5 font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-wider w-[40%]">Category</th>
+              <th className="px-5 py-2.5 font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Assigned</th>
+              <th className="px-5 py-2.5 font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Activity</th>
+              <th className="px-5 py-2.5 font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Available</th>
             </tr>
           </thead>
           <tbody>
@@ -142,7 +142,7 @@ export default function BudgetTable({
                 <React.Fragment key={group.id}>
                   {/* Group Header Row */}
                   <tr 
-                    className="bg-gradient-to-r from-slate-50 to-white hover:from-slate-100 hover:to-slate-50 cursor-pointer transition-all border-b border-slate-200 group/row"
+                    className="bg-gradient-to-r from-slate-50 to-white hover:from-slate-100 hover:to-slate-50 cursor-pointer transition-all border-b border-slate-200 dark:border-slate-700 group/row"
                     onClick={() => toggleGroup(group.id)}
                     onContextMenu={(e) => handleContextMenu(e, 'group', group.id)}
                   >
@@ -150,7 +150,7 @@ export default function BudgetTable({
                       setInlineEditing({ id: group.id, type: 'group', name: group.name })
                     }}>
                       <div className="flex items-center gap-2">
-                        <span className="text-slate-400 group-hover/row:text-slate-600 transition-colors" onClick={(e) => { e.stopPropagation(); toggleGroup(group.id) }}>
+                        <span className="text-slate-400 dark:text-slate-500 group-hover/row:text-slate-600 dark:text-slate-400 dark:text-slate-500 transition-colors" onClick={(e) => { e.stopPropagation(); toggleGroup(group.id) }}>
                           {group.isExpanded ? <ChevronDown size={14}/> : <ChevronRight size={14}/>}
                         </span>
                         {inlineEditing?.id === group.id && inlineEditing?.type === 'group' ? (
@@ -164,27 +164,27 @@ export default function BudgetTable({
                               if (e.key === 'Escape') setInlineEditing(null)
                             }}
                             onBlur={handleInlineEditSubmit}
-                            className="font-bold text-slate-700 text-[13px] uppercase tracking-wide bg-white border border-[#005A87] rounded px-1 outline-none"
+                            className="font-bold text-slate-700 dark:text-slate-300 text-[13px] uppercase tracking-wide bg-white dark:bg-slate-900 border border-[#005A87] rounded px-1 outline-none"
                             onClick={(e) => e.stopPropagation()}
                           />
                         ) : (
-                          <span className="font-bold text-slate-700 text-[13px] uppercase tracking-wide">{group.name}</span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300 text-[13px] uppercase tracking-wide">{group.name}</span>
                         )}
                         <button 
                           onClick={(e) => handleContextMenu(e, 'group', group.id)}
-                          className="opacity-0 group-hover/row:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-all"
+                          className="opacity-0 group-hover/row:opacity-100 p-0.5 hover:bg-slate-200 dark:hover:bg-slate-700 dark:bg-slate-700 rounded transition-all"
                         >
-                          <MoreHorizontal size={14} className="text-slate-400" />
+                          <MoreHorizontal size={14} className="text-slate-400 dark:text-slate-500" />
                         </button>
                       </div>
                     </td>
-                    <td className="px-5 py-2.5 font-semibold text-right text-slate-600 text-[13px]">
+                    <td className="px-5 py-2.5 font-semibold text-right text-slate-600 dark:text-slate-400 dark:text-slate-500 text-[13px]">
                       {formatCurrency(groupAssigned)}
                     </td>
-                    <td className="px-5 py-2.5 font-semibold text-right text-slate-600 text-[13px]">
+                    <td className="px-5 py-2.5 font-semibold text-right text-slate-600 dark:text-slate-400 dark:text-slate-500 text-[13px]">
                       {formatCurrency(groupActivity)}
                     </td>
-                    <td className="px-5 py-2.5 font-semibold text-right text-slate-600 text-[13px]">
+                    <td className="px-5 py-2.5 font-semibold text-right text-slate-600 dark:text-slate-400 dark:text-slate-500 text-[13px]">
                       {formatCurrency(groupAvailable)}
                     </td>
                   </tr>
@@ -200,7 +200,7 @@ export default function BudgetTable({
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.12 }}
                           key={category.id} 
-                          className={`cursor-pointer transition-all border-b border-slate-50 group/cat ${
+                          className={`cursor-pointer transition-all border-b border-slate-50 dark:border-slate-800/50 group/cat ${
                             isSelected 
                               ? "bg-blue-50/60 border-l-2 border-l-[#005A87]" 
                               : catIndex % 2 === 1 
@@ -214,7 +214,7 @@ export default function BudgetTable({
                             setInlineEditing({ id: category.id, type: 'category', name: category.name })
                           }}>
                             <div className="flex flex-col gap-1 ml-5">
-                              <span className="font-medium text-slate-700 flex items-center gap-1.5 text-[13px]">
+                              <span className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-1.5 text-[13px]">
                                 {inlineEditing?.id === category.id && inlineEditing?.type === 'category' ? (
                                   <input
                                     autoFocus
@@ -226,7 +226,7 @@ export default function BudgetTable({
                                       if (e.key === 'Escape') setInlineEditing(null)
                                     }}
                                     onBlur={handleInlineEditSubmit}
-                                    className="bg-white border border-[#005A87] rounded px-1 outline-none w-32"
+                                    className="bg-white dark:bg-slate-900 border border-[#005A87] rounded px-1 outline-none w-32"
                                     onClick={(e) => e.stopPropagation()}
                                   />
                                 ) : (
@@ -236,7 +236,7 @@ export default function BudgetTable({
                               </span>
                               {/* Progress Bar */}
                               {category.target > 0 && (
-                                <div className="w-20 h-1 bg-slate-200 rounded-full overflow-hidden">
+                                <div className="w-20 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                   <motion.div 
                                     initial={{ width: 0 }}
                                     animate={{ width: `${Math.min(100, (category.available / category.target) * 100)}%` }}
@@ -260,12 +260,12 @@ export default function BudgetTable({
                                 step="0.01"
                               />
                             ) : (
-                              <div className="inline-block px-2.5 py-0.5 rounded-md hover:bg-slate-100 transition-colors cursor-text text-slate-700 font-medium text-[13px] border border-transparent hover:border-slate-200">
+                              <div className="inline-block px-2.5 py-0.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors cursor-text text-slate-700 dark:text-slate-300 font-medium text-[13px] border border-transparent hover:border-slate-200 dark:border-slate-700">
                                 {formatCurrency(category.assigned)}
                               </div>
                             )}
                           </td>
-                          <td className="px-5 py-2 text-right font-medium text-slate-500 text-[13px]">
+                          <td className="px-5 py-2 text-right font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 text-[13px]">
                             {formatCurrency(category.activity)}
                           </td>
                           <td className="px-5 py-2 text-right">
@@ -289,7 +289,7 @@ export default function BudgetTable({
 
                   {/* Add Category Row */}
                   {group.isExpanded && (
-                    <tr className="border-b border-slate-100">
+                    <tr className="border-b border-slate-100 dark:border-slate-800">
                       <td colSpan={4} className="px-5 py-1">
                         {addingCategoryGroupId === group.id ? (
                           <div className="flex items-center gap-2 ml-5">
@@ -313,7 +313,7 @@ export default function BudgetTable({
                             </button>
                             <button 
                               onClick={() => { setAddingCategoryGroupId(null); setNewCategoryName("") }}
-                              className="px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-700 transition-colors"
+                              className="px-2.5 py-1 text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300 transition-colors"
                             >
                               Cancel
                             </button>
@@ -321,7 +321,7 @@ export default function BudgetTable({
                         ) : (
                           <button 
                             onClick={() => setAddingCategoryGroupId(group.id)}
-                            className="flex items-center gap-1.5 ml-5 text-xs font-medium text-slate-400 hover:text-[#005A87] transition-colors py-1"
+                            className="flex items-center gap-1.5 ml-5 text-xs font-medium text-slate-400 dark:text-slate-500 hover:text-[#005A87] transition-colors py-1"
                           >
                             <Plus size={12} />
                             Add Category
@@ -346,19 +346,19 @@ export default function BudgetTable({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed z-50 bg-white rounded-lg shadow-xl border border-slate-200 py-1.5 w-48"
+              className="fixed z-50 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 py-1.5 w-48"
               style={{ left: contextMenu.x, top: contextMenu.y }}
             >
               {contextMenu.type === 'category' ? (
                 <>
-                  <button onClick={() => handleRenameCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Rename</button>
+                  <button onClick={() => handleRenameCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Rename</button>
                   <button onClick={() => handleDeleteCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600">Delete</button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => handleRenameGroup(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Rename Group</button>
-                  <button onClick={() => { setAddingCategoryGroupId(contextMenu.id); setContextMenu(null) }} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Add Category</button>
-                  <div className="border-t border-slate-100 my-1"></div>
+                  <button onClick={() => handleRenameGroup(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Rename Group</button>
+                  <button onClick={() => { setAddingCategoryGroupId(contextMenu.id); setContextMenu(null) }} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Add Category</button>
+                  <div className="border-t border-slate-100 dark:border-slate-800 my-1"></div>
                   <button onClick={() => handleDeleteGroup(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600">Delete Group</button>
                 </>
               )}

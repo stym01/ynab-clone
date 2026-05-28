@@ -224,7 +224,7 @@ export default function BudgetView({
         onAutoAssignLastMonth={handleAutoAssignLastMonth}
         onResetAssigned={handleResetAssigned}
       />
-      <div className="flex flex-1 overflow-hidden bg-slate-50">
+      <div className="flex flex-1 overflow-hidden bg-slate-50 dark:bg-slate-800">
         {isMoveMoneyOpen && (
         <MoveMoneyModal
           onClose={() => setIsMoveMoneyOpen(false)}
@@ -233,8 +233,8 @@ export default function BudgetView({
           initialFromId={moveMoneyInitialFrom}
         />
       )}
-      <div className="flex flex-col flex-1 border-r border-slate-200 overflow-y-auto">
-        <div className="flex justify-between items-center px-6 py-3 border-b border-slate-200 bg-white">
+      <div className="flex flex-col flex-1 border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
+        <div className="flex justify-between items-center px-6 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
           <div className="flex gap-2">
             <button 
               onClick={async () => {
@@ -251,18 +251,18 @@ export default function BudgetView({
             >
               + Category Group
             </button>
-            <div className="border-l border-slate-200 mx-2"></div>
+            <div className="border-l border-slate-200 dark:border-slate-700 mx-2"></div>
             <button 
               onClick={handleUndo}
               disabled={past.length === 0}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 transition-colors shadow-sm disabled:opacity-50"
             >
               Undo
             </button>
             <button 
               onClick={handleRedo}
               disabled={future.length === 0}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-md hover:bg-slate-50 transition-colors shadow-sm disabled:opacity-50"
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 transition-colors shadow-sm disabled:opacity-50"
             >
               Redo
             </button>
@@ -274,28 +274,28 @@ export default function BudgetView({
             </button>
           </div>
           
-          <div className="flex bg-slate-100 p-1 rounded-lg">
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
             <button 
               onClick={() => setActiveFilter('all')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'all' ? 'bg-white shadow text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'all' ? 'bg-white dark:bg-slate-900 shadow text-slate-800 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300'}`}
             >
               All
             </button>
             <button 
               onClick={() => setActiveFilter('underfunded')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'underfunded' ? 'bg-white shadow text-[#E8A317]' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'underfunded' ? 'bg-white dark:bg-slate-900 shadow text-[#E8A317]' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300'}`}
             >
               Underfunded
             </button>
             <button 
               onClick={() => setActiveFilter('overspent')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'overspent' ? 'bg-white shadow text-[#E54545]' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'overspent' ? 'bg-white dark:bg-slate-900 shadow text-[#E54545]' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300'}`}
             >
               Overspent
             </button>
             <button 
               onClick={() => setActiveFilter('available')}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'available' ? 'bg-white shadow text-[#23B573]' : 'text-slate-500 hover:text-slate-700'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${activeFilter === 'available' ? 'bg-white dark:bg-slate-900 shadow text-[#23B573]' : 'text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-300'}`}
             >
               Money Available
             </button>
@@ -330,7 +330,7 @@ export default function BudgetView({
         />
       </div>
       
-      <div className="w-[320px] bg-slate-50 overflow-y-auto shrink-0 border-l border-slate-200">
+      <div className="w-[320px] bg-slate-50 dark:bg-slate-800 overflow-y-auto shrink-0 border-l border-slate-200 dark:border-slate-700">
         <Inspector 
           categoryData={selectedCategoryData}
           onUpdateAssigned={handleUpdateAssigned}

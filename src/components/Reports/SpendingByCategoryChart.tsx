@@ -31,8 +31,8 @@ export default function SpendingByCategoryChart({ data }: SpendingByCategoryChar
   const renderCustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white p-3 rounded-lg shadow-md border border-slate-200">
-          <p className="font-semibold text-slate-700">{payload[0].name}</p>
+        <div className="bg-white dark:bg-slate-900 p-3 rounded-lg shadow-md border border-slate-200 dark:border-slate-700">
+          <p className="font-semibold text-slate-700 dark:text-slate-300">{payload[0].name}</p>
           <p className="text-[#005A87] font-bold">
             {formatCurrency(payload[0].payload.rawTotal)}
           </p>
@@ -43,10 +43,10 @@ export default function SpendingByCategoryChart({ data }: SpendingByCategoryChar
   }
 
   return (
-    <div className="w-full h-[400px] bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+    <div className="w-full h-[400px] bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
       <div className="mb-2">
-        <h2 className="text-xl font-bold text-slate-800">Spending by Category</h2>
-        <p className="text-sm text-slate-500 mt-1">Breakdown of where your money goes.</p>
+        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Spending by Category</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Breakdown of where your money goes.</p>
       </div>
       
       <div className="flex-1 w-full min-h-0">
@@ -77,7 +77,7 @@ export default function SpendingByCategoryChart({ data }: SpendingByCategoryChar
             </PieChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center text-slate-400">
+          <div className="h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
             No spending data available.
           </div>
         )}
