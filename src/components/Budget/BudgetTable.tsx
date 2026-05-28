@@ -33,6 +33,7 @@ export default function BudgetTable({
   }
 
   const prevSelectedCategoryId = React.useRef(selectedCategoryId)
+  const assignedInputRef = React.useRef<HTMLInputElement>(null)
   
   React.useEffect(() => {
     if (selectedCategoryId !== prevSelectedCategoryId.current) {
@@ -45,6 +46,9 @@ export default function BudgetTable({
         }
         if (foundCategory) {
           setEditValue((foundCategory.assigned / 100).toFixed(2))
+          setTimeout(() => {
+            assignedInputRef.current?.select()
+          }, 0)
         }
       }
     }
@@ -308,6 +312,7 @@ export default function BudgetTable({
                                   <div>×÷</div>
                                 </div>
                                 <input
+                                  ref={assignedInputRef}
                                   autoFocus
                                   type="text"
                                   value={editValue}
