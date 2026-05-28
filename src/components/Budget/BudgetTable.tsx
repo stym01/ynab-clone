@@ -223,6 +223,12 @@ export default function BudgetTable({
                           <span className="font-bold text-slate-700 text-[13px] uppercase tracking-wide">{group.name}</span>
                         )}
                         <button 
+                          onClick={(e) => { e.stopPropagation(); setAddingCategoryGroupId(group.id); setNewCategoryName(""); }}
+                          className="w-[15px] h-[15px] rounded-full bg-[#5155C3] flex items-center justify-center text-white hover:bg-[#3B42A4] transition-colors shadow-sm ml-1"
+                        >
+                          <Plus size={10} strokeWidth={4} />
+                        </button>
+                        <button 
                           onClick={(e) => handleContextMenu(e, 'group', group.id)}
                           className="opacity-0 group-hover/row:opacity-100 p-0.5 hover:bg-slate-200 rounded transition-all"
                         >
@@ -394,10 +400,9 @@ export default function BudgetTable({
                   </AnimatePresence>
 
                   {/* Add Category Row */}
-                  {group.isExpanded && (
+                  {group.isExpanded && addingCategoryGroupId === group.id && (
                     <tr className="border-b border-slate-100">
                       <td colSpan={4} className="px-5 py-1">
-                        {addingCategoryGroupId === group.id ? (
                           <div className="flex items-center gap-2 ml-5">
                             <input
                               autoFocus
@@ -409,11 +414,11 @@ export default function BudgetTable({
                                 if (e.key === 'Escape') { setAddingCategoryGroupId(null); setNewCategoryName("") }
                               }}
                               placeholder="New category name"
-                              className="px-2 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] w-48"
+                              className="px-2 py-1 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#5155C3] w-48"
                             />
                             <button 
                               onClick={() => handleAddCategory(group.id)}
-                              className="px-2.5 py-1 text-xs font-medium text-white bg-[#23B573] rounded-md hover:bg-[#1da366] transition-colors"
+                              className="px-2.5 py-1 text-xs font-bold text-white bg-[#5155C3] rounded-md hover:bg-[#3B42A4] transition-colors"
                             >
                               Add
                             </button>
@@ -424,15 +429,6 @@ export default function BudgetTable({
                               Cancel
                             </button>
                           </div>
-                        ) : (
-                          <button 
-                            onClick={() => setAddingCategoryGroupId(group.id)}
-                            className="flex items-center gap-1.5 ml-5 text-xs font-medium text-slate-400 hover:text-[#005A87] transition-colors py-1"
-                          >
-                            <Plus size={12} />
-                            Add Category
-                          </button>
-                        )}
                       </td>
                     </tr>
                   )}
