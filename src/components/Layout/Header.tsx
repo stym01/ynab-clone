@@ -38,6 +38,14 @@ export default function Header({
   const rtaRef = useRef<HTMLDivElement>(null)
   const autoRef = useRef<HTMLDivElement>(null)
   const noteRef = useRef<HTMLDivElement>(null)
+  const monthDropdownRef = useRef<HTMLDivElement>(null)
+
+  const [showMonthDropdown, setShowMonthDropdown] = useState(false)
+  const [dropdownYear, setDropdownYear] = useState<number>(parseInt(month.split('-')[0]) || new Date().getFullYear())
+
+  useEffect(() => {
+    setDropdownYear(parseInt(month.split('-')[0]))
+  }, [month])
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -45,6 +53,7 @@ export default function Header({
       if (rtaRef.current && !rtaRef.current.contains(e.target as Node)) setShowRTABreakdown(false)
       if (autoRef.current && !autoRef.current.contains(e.target as Node)) setShowAutoAssign(false)
       if (noteRef.current && !noteRef.current.contains(e.target as Node)) setShowMonthNote(false)
+      if (monthDropdownRef.current && !monthDropdownRef.current.contains(e.target as Node)) setShowMonthDropdown(false)
     }
     document.addEventListener("mousedown", handleClick)
     return () => document.removeEventListener("mousedown", handleClick)
@@ -92,24 +101,84 @@ export default function Header({
     <header className="h-[72px] bg-white border-b border-slate-200 flex items-center justify-start gap-12 px-6 flex-shrink-0 shadow-sm relative z-20">
       
       {/* Left: Month Selector + Notes */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 relative" ref={monthDropdownRef}>
         <button 
           onClick={handlePrevMonth} 
-          className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+          className="p-0.5 rounded-full text-[#5155C3] border-2 border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
           aria-label="Previous month"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={18} strokeWidth={2.5} />
         </button>
-        <h1 className="text-xl font-bold text-slate-800 w-[180px] text-center select-none tracking-tight">
-          {readableMonth}
-        </h1>
+        
+        <div 
+          className="flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => setShowMonthDropdown(!showMonthDropdown)}
+        >
+          <h1 className="text-[22px] font-bold text-slate-800 text-center select-none tracking-tight">
+            {readableMonth}
+          </h1>
+          <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-1" />
+        </div>
+
         <button 
           onClick={handleNextMonth} 
-          className="p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-all active:scale-95"
+          className="p-0.5 rounded-full text-[#5155C3] border-2 border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
           aria-label="Next month"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={18} strokeWidth={2.5} />
         </button>
+
+        {/* Month Dropdown Popover */}
+        <AnimatePresence>
+          {showMonthDropdown && (
+            <motion.div
+              initial={{ opacity: 0, y: -4, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4, scale: 0.95 }}
+              className="absolute top-full left-4 mt-2 w-64 bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-slate-100 p-4 z-50 origin-top-left"
+            >
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <button 
+                  onClick={() => setDropdownYear(y => y - 1)}
+                  className="p-0.5 rounded-full text-[#5155C3] border-2 border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
+                >
+                  <ChevronLeft size={16} strokeWidth={2.5} />
+                </button>
+                <span className="font-bold text-[17px] text-slate-800">{dropdownYear}</span>
+                <button 
+                  onClick={() => setDropdownYear(y => y + 1)}
+                  className="p-0.5 rounded-full text-[#5155C3] border-2 border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
+                >
+                  <ChevronRight size={16} strokeWidth={2.5} />
+                </button>
+              </div>
+              <div className="grid grid-cols-3 gap-y-3 gap-x-2">
+                {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, index) => {
+                  const mStr = String(index + 1).padStart(2, '0')
+                  const isCurrent = `${dropdownYear}-${mStr}` === month
+                  
+                  return (
+                    <button
+                      key={m}
+                      onClick={() => {
+                        const newMonth = `${dropdownYear}-${mStr}`
+                        router.push(`?month=${newMonth}`)
+                        setShowMonthDropdown(false)
+                      }}
+                      className={`text-[15px] font-bold py-2 px-1 rounded-md transition-all ${
+                        isCurrent 
+                          ? 'bg-[#5155C3] text-white shadow-sm' 
+                          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  )
+                })}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Month Notes Icon */}
         <div ref={noteRef} className="relative">
