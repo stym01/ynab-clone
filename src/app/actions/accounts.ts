@@ -432,3 +432,37 @@ export async function bulkCategorizeTransactions(transactionIds: string[], categ
 
   revalidatePath("/")
 }
+
+export async function updateAccount(accountId: string, name: string, syncProvider: string | null) {
+  const user = await requireUser()
+  const account = await prisma.financialAccount.findUnique({ where: { id: accountId }, include: { budget: true } })
+  if (!account || account.budget.userId !== user.id) throw new Error("Unauthorized")
+
+  await prisma.financialAccount.update({
+    where: { id: accountId },
+    data: { name, syncProvider }
+  })
+
+  if (syncProvider === "ICICI_GMAIL") {
+    try {
+      await enableGmailWatch(accountId, "projects/gen-lang-client-0222112657/topics/gmail-push")
+    } catch (e) {
+      console.error("Failed to enable Gmail watch:", e)
+    }
+  }
+
+  revalidatePath("/")
+}
+
+export async function closeAccount(accountId: string) {
+  const user = await requireUser()
+  const account = await prisma.financialAccount.findUnique({ where: { id: accountId }, include: { budget: true } })
+  if (!account || account.budget.userId !== user.id) throw new Error("Unauthorized")
+
+  await prisma.financialAccount.update({
+    where: { id: accountId },
+    data: { isClosed: true, syncProvider: null } // Stop sync if closed
+  })
+
+  revalidatePath("/")
+}

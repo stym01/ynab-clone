@@ -5,11 +5,12 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
 import AddAccountModal from "../Accounts/AddAccountModal"
+import EditAccountModal from "../Accounts/EditAccountModal"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronDown, ChevronsLeft, ChevronsRight, PieChart, 
   Landmark, Wallet, CreditCard, PiggyBank, Plus, 
-  MoreHorizontal, Archive, Settings, LogOut
+  MoreHorizontal, Archive, Settings, LogOut, Pencil
 } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
 
@@ -17,6 +18,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
   const pathname = usePathname()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [accountToEdit, setAccountToEdit] = useState<any>(null)
   const [isBudgetDropdownOpen, setIsBudgetDropdownOpen] = useState(false)
   const [showBudgetAccounts, setShowBudgetAccounts] = useState(true)
 
@@ -172,19 +174,28 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                       <Link 
                         href={`/accounts/${acc.id}`} 
                         key={acc.id} 
-                        className={`flex justify-between items-center px-5 py-2 text-sm transition-all ${
+                        className={`group flex justify-between items-center px-5 py-2 text-sm transition-all ${
                           pathname === `/accounts/${acc.id}` 
                             ? 'bg-white/10 text-white' 
                             : 'text-white/60 hover:bg-white/5 hover:text-white/90'
                         }`}
                       >
-                        <span className="flex items-center gap-2.5 truncate mr-2">
+                        <span className="flex items-center gap-2.5 truncate mr-2 flex-1">
                           {getAccountIcon(acc.type)}
                           <span className="truncate">{acc.name}</span>
                         </span>
-                        <span className={`text-xs font-medium shrink-0 tabular-nums ${acc.balance < 0 ? 'text-red-400' : ''}`}>
-                          {formatCurrency(acc.balance)}
-                        </span>
+                        
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={(e) => { e.preventDefault(); setAccountToEdit(acc); }}
+                            className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-opacity"
+                          >
+                            <Pencil size={12} className="text-white/60 hover:text-white" />
+                          </button>
+                          <span className={`text-xs font-medium shrink-0 tabular-nums ${acc.balance < 0 ? 'text-red-400' : ''}`}>
+                            {formatCurrency(acc.balance)}
+                          </span>
+                        </div>
                       </Link>
                     ))}
                   </motion.div>
@@ -219,19 +230,28 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                         <Link 
                           href={`/accounts/${acc.id}`} 
                           key={acc.id} 
-                          className={`flex justify-between items-center px-5 py-2 text-sm transition-all ${
+                          className={`group flex justify-between items-center px-5 py-2 text-sm transition-all ${
                             pathname === `/accounts/${acc.id}` 
                               ? 'bg-white/10 text-white' 
                               : 'text-white/60 hover:bg-white/5 hover:text-white/90'
                           }`}
                         >
-                          <span className="flex items-center gap-2.5 truncate mr-2">
+                          <span className="flex items-center gap-2.5 truncate mr-2 flex-1">
                             <CreditCard size={15} />
                             <span className="truncate">{acc.name}</span>
                           </span>
-                          <span className={`text-xs font-medium shrink-0 tabular-nums ${acc.balance < 0 ? 'text-red-400' : ''}`}>
-                            {formatCurrency(acc.balance)}
-                          </span>
+                          
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={(e) => { e.preventDefault(); setAccountToEdit(acc); }}
+                              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-opacity"
+                            >
+                              <Pencil size={12} className="text-white/60 hover:text-white" />
+                            </button>
+                            <span className={`text-xs font-medium shrink-0 tabular-nums ${acc.balance < 0 ? 'text-red-400' : ''}`}>
+                              {formatCurrency(acc.balance)}
+                            </span>
+                          </div>
                         </Link>
                       ))}
                     </motion.div>
@@ -264,15 +284,23 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                         <Link 
                           href={`/accounts/${acc.id}`} 
                           key={acc.id} 
-                          className="flex justify-between items-center px-5 py-2 text-sm text-white/30 hover:bg-white/5 transition-all"
+                          className="group flex justify-between items-center px-5 py-2 text-sm text-white/30 hover:bg-white/5 transition-all"
                         >
-                          <span className="flex items-center gap-2.5 truncate mr-2">
+                          <span className="flex items-center gap-2.5 truncate mr-2 flex-1">
                             {getAccountIcon(acc.type)}
                             <span className="truncate line-through">{acc.name}</span>
                           </span>
-                          <span className="text-xs font-medium shrink-0 tabular-nums">
-                            {formatCurrency(acc.balance)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <button 
+                              onClick={(e) => { e.preventDefault(); setAccountToEdit(acc); }}
+                              className="opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-opacity"
+                            >
+                              <Pencil size={12} className="text-white/60 hover:text-white" />
+                            </button>
+                            <span className="text-xs font-medium shrink-0 tabular-nums">
+                              {formatCurrency(acc.balance)}
+                            </span>
+                          </div>
                         </Link>
                       ))}
                     </motion.div>
@@ -313,6 +341,15 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
       <AnimatePresence>
         {isModalOpen && (
           <AddAccountModal onClose={() => setIsModalOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {accountToEdit && (
+          <EditAccountModal 
+            account={accountToEdit} 
+            onClose={() => setAccountToEdit(null)} 
+          />
         )}
       </AnimatePresence>
     </>
