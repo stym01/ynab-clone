@@ -5,24 +5,26 @@ import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 
-const ICICI_REGEX = /Your ICICI Bank Credit Card XX(?<card>\d+) has been used for a transaction of INR (?<amount>[\d,.]+) on (?<date>[a-zA-Z]{3} \d{1,2}, \d{4}) at (?<time>\d{2}:\d{2}:\d{2})\. Info: (?<info>.*?)\./;
+const ICICI_REGEX = /Your ICICI Bank Credit Card XX(\d+) has been used for a transaction of INR ([\d,.]+) on ([a-zA-Z]{3} \d{1,2}, \d{4}) at (\d{2}:\d{2}:\d{2})\. Info: (.*?)\./;
 
-export async function parseICICIContent(text: string) {
+async function parseICICIContent(text: string) {
   const match = text.match(ICICI_REGEX);
-  if (!match || !match.groups) return null;
-  const { amount, date, time, info, card } = match.groups;
-  
-  // Convert INR amount to paise (cents equivalent)
-  const amountFloat = parseFloat(amount.replace(/,/g, ''));
-  const amountPaise = Math.round(amountFloat * 100);
+  if (!match) return null;
 
+  const card = match[1];
+  const amountStr = match[2];
+  const date = match[3];
+  const time = match[4];
+  const info = match[5];
+
+  const amountPaise = Math.round(parseFloat(amountStr.replace(/,/g, '')) * 100);
   const parsedDate = new Date(`${date} ${time}`);
   
   return {
     amountPaise,
     date: parsedDate,
     payeeName: info.trim(),
-    card,
+    card
   };
 }
 
