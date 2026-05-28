@@ -28,6 +28,9 @@ export default function BudgetView({
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [groups, setGroups] = useState(initialData?.categoryGroups || [])
   
+  const [isAddingCategoryGroup, setIsAddingCategoryGroup] = useState(false)
+  const [newCategoryGroupName, setNewCategoryGroupName] = useState("")
+
   const [past, setPast] = useState<{ categoryId: string, amount: number }[]>([])
   const [future, setFuture] = useState<{ categoryId: string, amount: number }[]>([])
 
@@ -254,6 +257,18 @@ export default function BudgetView({
 
   const allCategories = groups.flatMap((g: any) => g.categories)
 
+  const handleAddCategoryGroup = async () => {
+    if (newCategoryGroupName.trim()) {
+      const { createCategoryGroup } = await import("@/app/actions/budget")
+      const budgetId = initialData?.id
+      if (budgetId) {
+        await createCategoryGroup(budgetId, newCategoryGroupName.trim())
+      }
+    }
+    setIsAddingCategoryGroup(false)
+    setNewCategoryGroupName("")
+  }
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <Header 
@@ -315,21 +330,52 @@ export default function BudgetView({
         {/* Toolbar Row */}
         <div className="flex justify-between items-center px-6 py-3 border-b border-slate-200 bg-white">
           <div className="flex gap-4 items-center">
-            <button 
-              onClick={async () => {
-                const name = window.prompt("Enter new category group name:")
-                if (name) {
-                  const { createCategoryGroup } = await import("@/app/actions/budget")
-                  const budgetId = initialData?.id
-                  if (budgetId) {
-                    await createCategoryGroup(budgetId, name)
-                  }
-                }
-              }}
-              className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5"
-            >
-              <PlusCircle size={16} className="fill-[#5155C3] text-white" /> Category Group
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setIsAddingCategoryGroup(true)}
+                className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5"
+              >
+                <PlusCircle size={16} className="fill-[#5155C3] text-white" /> Category Group
+              </button>
+              
+              {isAddingCategoryGroup && (
+                <div className="absolute top-full left-0 mt-3 w-[280px] bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-slate-100 p-4 z-50">
+                  <div className="absolute -top-2 left-6 w-4 h-4 bg-white border-t border-l border-slate-100 rotate-45"></div>
+                  <input
+                    autoFocus
+                    type="text"
+                    value={newCategoryGroupName}
+                    onChange={(e) => setNewCategoryGroupName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddCategoryGroup()
+                      if (e.key === 'Escape') {
+                        setIsAddingCategoryGroup(false)
+                        setNewCategoryGroupName("")
+                      }
+                    }}
+                    placeholder="New Category Group"
+                    className="w-full px-3 py-2 text-[15px] border border-[#5155C3] rounded-md focus:outline-none focus:ring-2 focus:ring-[#5155C3]/20 relative z-10"
+                  />
+                  <div className="flex justify-end gap-2 mt-4 relative z-10">
+                    <button 
+                      onClick={() => {
+                        setIsAddingCategoryGroup(false)
+                        setNewCategoryGroupName("")
+                      }}
+                      className="px-5 py-1.5 text-[14px] font-bold text-[#5155C3] bg-[#F0F2FF] rounded-lg hover:bg-[#E5E7FF] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={handleAddCategoryGroup}
+                      className="px-5 py-1.5 text-[14px] font-bold text-white bg-[#5155C3] rounded-lg hover:bg-[#3B42A4] transition-colors"
+                    >
+                      OK
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
             <button 
               onClick={handleUndo}
               disabled={past.length === 0}
