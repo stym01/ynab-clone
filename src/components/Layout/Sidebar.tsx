@@ -136,10 +136,6 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
             <Landmark size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>All Accounts</span>}
           </Link>
-          <Link href="/settings" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/settings") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
-            <Settings size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
-            {!isCollapsed && <span>Settings (Bank Sync)</span>}
-          </Link>
         </nav>
 
         {/* Account Lists */}
