@@ -55,7 +55,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
         initial={false}
         animate={{ width: isCollapsed ? 64 : 260 }}
         transition={{ duration: 0.2, ease: "easeInOut" }}
-        className="flex flex-col bg-[#003F5E] text-white flex-shrink-0 relative z-10 h-full"
+        className="flex flex-col bg-[#1a1c3b] text-white flex-shrink-0 relative z-10 h-full"
         style={{ minHeight: '100vh' }}
       >
         {/* Budget Switcher Header */}
@@ -126,16 +126,16 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col py-3 gap-0.5">
-          <Link href="/budget" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/budget") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
+        <nav className="flex flex-col py-3 gap-1">
+          <Link href="/budget" className={`flex items-center px-3 py-2 mx-2 rounded-lg transition-all text-sm ${isActive("/budget") ? "bg-[#33399b] text-white font-bold shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
             <Wallet size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>Budget</span>}
           </Link>
-          <Link href="/reports" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/reports") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
+          <Link href="/reports" className={`flex items-center px-3 py-2 mx-2 rounded-lg transition-all text-sm ${isActive("/reports") ? "bg-[#33399b] text-white font-bold shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
             <PieChart size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>Reports</span>}
           </Link>
-          <Link href="/accounts" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/accounts") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
+          <Link href="/accounts" className={`flex items-center px-3 py-2 mx-2 rounded-lg transition-all text-sm ${isActive("/accounts") ? "bg-[#33399b] text-white font-bold shadow-sm" : "text-white/80 hover:bg-white/10 hover:text-white"}`}>
             <Landmark size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>All Accounts</span>}
           </Link>

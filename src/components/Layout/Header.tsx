@@ -100,7 +100,7 @@ export default function Header({
         >
           <ChevronLeft size={20} />
         </button>
-        <h1 className="text-xl font-bold text-[#005A87] w-[180px] text-center select-none tracking-tight">
+        <h1 className="text-xl font-bold text-slate-800 w-[180px] text-center select-none tracking-tight">
           {readableMonth}
         </h1>
         <button 
@@ -115,7 +115,7 @@ export default function Header({
         <div ref={noteRef} className="relative">
           <button 
             onClick={() => setShowMonthNote(!showMonthNote)}
-            className={`p-1.5 rounded-full transition-all ${showMonthNote ? 'bg-[#005A87] text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
+            className={`p-1.5 rounded-full transition-all ${showMonthNote ? 'bg-slate-800 text-white' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'}`}
             aria-label="Month notes"
           >
             <StickyNote size={16} />
@@ -148,25 +148,29 @@ export default function Header({
 
       {/* Center: Ready To Assign Pill (Clickable → Breakdown) */}
       <div ref={rtaRef} className="relative">
-        <button
-          onClick={() => setShowRTABreakdown(!showRTABreakdown)}
-          className={`
-            flex flex-col items-center justify-center px-8 py-2 rounded-full cursor-pointer
-            transition-all active:scale-[0.98] hover:shadow-md
-            ${rtaPositive 
-              ? 'bg-[#23B573] text-white shadow-sm' 
-              : 'bg-[#E54545] text-white shadow-sm'
-            }
-          `}
-        >
-          <div className="text-lg font-bold tracking-tight leading-tight">
-            {formatCurrency(readyToAssign)}
+        <div className={`
+          flex items-center justify-between pl-6 pr-2 py-1.5 rounded-[20px]
+          transition-all
+          ${rtaPositive 
+            ? 'bg-[#98E85B] shadow-sm' 
+            : 'bg-[#E54545] shadow-sm'
+          }
+        `}>
+          <div className="flex flex-col items-start pr-8 cursor-pointer" onClick={() => setShowRTABreakdown(!showRTABreakdown)}>
+            <div className={`text-[22px] font-bold tracking-tight leading-none mb-0.5 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
+              {formatCurrency(readyToAssign)}
+            </div>
+            <div className={`text-xs font-medium opacity-90 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
+              Ready to Assign
+            </div>
           </div>
-          <div className="text-[10px] font-bold uppercase tracking-wider opacity-90 flex items-center gap-1">
-            Ready to Assign
-            <ChevronDown size={10} className={`transition-transform ${showRTABreakdown ? 'rotate-180' : ''}`} />
-          </div>
-        </button>
+          <button className={`
+            flex items-center gap-1 px-4 py-1.5 rounded-2xl font-bold text-sm transition-colors
+            ${rtaPositive ? 'bg-[#549320] hover:bg-[#437519] text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
+          `}>
+            Assign <ChevronDown size={14} />
+          </button>
+        </div>
 
         {/* RTA Breakdown Popover */}
         <AnimatePresence>
