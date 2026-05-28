@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronRight, ChevronDown, Zap, Plus, MoreHorizontal } from "lucide-react"
+import { ChevronRight, ChevronDown, Zap, Plus, MoreHorizontal, Check, Minus } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
 import { addCategory, renameCategory, deleteCategory, renameCategoryGroup, deleteCategoryGroup } from "@/app/actions/budget"
 
@@ -13,13 +13,15 @@ interface BudgetTableProps {
   onSelectCategory: (id: string) => void
   onUpdateAssigned: (categoryId: string, amount: number) => Promise<void>
   onAvailableClick?: (categoryId: string) => void
+  onMoveMoney?: (amountCents: number, fromId: string, toId: string) => Promise<void>
 }
 
 export default function BudgetTable({ 
-  groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick 
+  groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney
 }: BudgetTableProps) {
   
   const [editValue, setEditValue] = useState<string>("")
+  const [coverOverspendingId, setCoverOverspendingId] = useState<string | null>(null)
   const [contextMenu, setContextMenu] = useState<{ type: 'category' | 'group', id: string, x: number, y: number } | null>(null)
   const [addingCategoryGroupId, setAddingCategoryGroupId] = useState<string | null>(null)
   const [newCategoryName, setNewCategoryName] = useState("")
@@ -161,7 +163,12 @@ export default function BudgetTable({
         <table className="w-full text-sm text-left whitespace-nowrap">
           <thead className="sticky top-0 bg-white border-b border-slate-200 z-10">
             <tr>
-              <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider w-[40%]">Category</th>
+              <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider w-[40%]">
+                <div className="flex items-center gap-3">
+                  <div className="w-3.5 h-3.5 rounded-[3px] border border-slate-300 flex-shrink-0 bg-white"></div>
+                  CATEGORY
+                </div>
+              </th>
               <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Assigned</th>
               <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Activity</th>
               <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Available</th>
@@ -172,6 +179,8 @@ export default function BudgetTable({
               const groupAssigned = group.categories.reduce((sum: number, c: any) => sum + c.assigned, 0)
               const groupActivity = group.categories.reduce((sum: number, c: any) => sum + c.activity, 0)
               const groupAvailable = group.categories.reduce((sum: number, c: any) => sum + c.available, 0)
+
+              const hasSelectedChild = group.categories.some((c: any) => c.id === selectedCategoryId)
 
               return (
                 <React.Fragment key={group.id}>
@@ -188,6 +197,10 @@ export default function BudgetTable({
                         <span className="text-slate-400 group-hover/row:text-slate-600 transition-colors" onClick={(e) => { e.stopPropagation(); toggleGroup(group.id) }}>
                           {group.isExpanded ? <ChevronDown size={14}/> : <ChevronRight size={14}/>}
                         </span>
+                        
+                        <div className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 ${hasSelectedChild || selectedCategoryId === group.id ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}>
+                          {(hasSelectedChild || selectedCategoryId === group.id) && <Minus size={10} className="text-white" strokeWidth={3} />}
+                        </div>
                         {inlineEditing?.id === group.id && inlineEditing?.type === 'group' ? (
                           <input
                             autoFocus
@@ -249,7 +262,11 @@ export default function BudgetTable({
                             setInlineEditing({ id: category.id, type: 'category', name: category.name })
                           }}>
                             <div className="flex flex-col gap-1 ml-5">
-                              <span className="font-medium text-slate-700 flex items-center gap-1.5 text-[13px]">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 ${isSelected ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}>
+                                  {isSelected && <Check size={10} className="text-white" strokeWidth={3} />}
+                                </div>
+                                <span className="font-medium text-slate-700 flex items-center gap-1.5 text-[13px]">
                                 {inlineEditing?.id === category.id && inlineEditing?.type === 'category' ? (
                                   <input
                                     autoFocus
@@ -269,6 +286,7 @@ export default function BudgetTable({
                                 )}
                                 {category.target > 0 && <Zap size={11} className="text-[#E8A317]" />}
                               </span>
+                              </div>
                               {/* Progress Bar */}
                               {category.target > 0 && (
                                 <div className="w-20 h-1 bg-slate-200 rounded-full overflow-hidden">
@@ -310,19 +328,60 @@ export default function BudgetTable({
                           <td className="px-5 py-2 text-right font-medium text-slate-500 text-[13px]">
                             {formatCurrency(category.activity)}
                           </td>
-                          <td className="px-5 py-2 text-right">
+                          <td className="px-5 py-2 text-right relative">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation()
-                                onAvailableClick?.(category.id)
+                                if (category.available < 0) {
+                                  setCoverOverspendingId(category.id)
+                                } else {
+                                  onAvailableClick?.(category.id)
+                                }
                               }}
                               className={`
-                                inline-block px-3 py-0.5 rounded-full font-bold text-[12px] min-w-[80px] text-center transition-opacity hover:opacity-80
+                                inline-block px-3 py-0.5 rounded-full font-bold text-[12px] min-w-[80px] text-center transition-opacity hover:opacity-80 flex items-center justify-end gap-1 ml-auto
                                 ${getAvailableColor(category)}
                               `}
                             >
-                              {formatCurrency(category.available)}
+                              {category.available < 0 && <span>!</span>}
+                              <span>{formatCurrency(category.available)}</span>
                             </button>
+                            {coverOverspendingId === category.id && (
+                              <div className="absolute top-full right-5 mt-2 w-64 bg-white rounded-lg shadow-xl border border-slate-200 z-50 p-4 animate-in fade-in zoom-in-95" onClick={e => e.stopPropagation()}>
+                                <div className="absolute -top-2 right-4 w-4 h-4 bg-white border-l border-t border-slate-200 transform rotate-45"></div>
+                                <div className="relative z-10 text-left">
+                                  <h3 className="text-[13px] font-bold text-slate-800 mb-2">Cover overspending from</h3>
+                                  <select 
+                                    className="w-full p-2 border border-slate-200 rounded-md text-[13px] outline-none focus:border-[#5155C3] bg-white text-slate-700"
+                                    defaultValue=""
+                                    onChange={(e) => {
+                                      const fromId = e.target.value
+                                      if (fromId) {
+                                        const amountNeeded = Math.abs(category.available)
+                                        if (onMoveMoney) {
+                                          onMoveMoney(amountNeeded, fromId, category.id)
+                                        }
+                                        setCoverOverspendingId(null)
+                                      }
+                                    }}
+                                  >
+                                    <option value="" disabled></option>
+                                    <option value="RTA">Ready to Assign</option>
+                                    {groups.flatMap(g => g.categories).filter(c => c.id !== category.id).map(c => (
+                                      <option key={c.id} value={c.id}>{c.name} ({formatCurrency(c.available)})</option>
+                                    ))}
+                                  </select>
+                                  <div className="mt-4 flex justify-end">
+                                    <button 
+                                      onClick={() => setCoverOverspendingId(null)}
+                                      className="px-4 py-1.5 bg-[#EEF2FC] text-[#5155C3] font-semibold text-[13px] rounded-md hover:bg-[#E5EAF5] transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                           </td>
                         </motion.tr>
                       )

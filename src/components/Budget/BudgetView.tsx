@@ -364,6 +364,7 @@ export default function BudgetView({
           selectedCategoryId={selectedCategoryId}
           onSelectCategory={setSelectedCategoryId}
           onUpdateAssigned={handleUpdateAssigned}
+          onMoveMoney={handleMoveMoney}
           onAvailableClick={(categoryId) => {
             setMoveMoneyInitialFrom(categoryId)
             setIsMoveMoneyOpen(true)
