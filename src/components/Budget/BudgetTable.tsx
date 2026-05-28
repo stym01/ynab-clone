@@ -142,8 +142,8 @@ export default function BudgetTable({
                 <React.Fragment key={group.id}>
                   {/* Group Header Row */}
                   <tr 
-                    className="bg-gradient-to-r from-slate-50 to-white hover:from-slate-100 hover:to-slate-50 cursor-pointer transition-all border-b border-slate-200 group/row"
-                    onClick={() => toggleGroup(group.id)}
+                    className={`cursor-pointer transition-all border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#E5E7FF]' : 'bg-gradient-to-r from-slate-50 to-white hover:from-slate-100 hover:to-slate-50'}`}
+                    onClick={() => { toggleGroup(group.id); onSelectCategory(group.id); }}
                     onContextMenu={(e) => handleContextMenu(e, 'group', group.id)}
                   >
                     <td className="px-5 py-2.5" onDoubleClick={() => {
@@ -202,7 +202,7 @@ export default function BudgetTable({
                           key={category.id} 
                           className={`cursor-pointer transition-all border-b border-slate-50 group/cat ${
                             isSelected 
-                              ? "bg-blue-50/60 border-l-2 border-l-[#005A87]" 
+                              ? "bg-[#E5E7FF] border-l-2 border-l-[#005A87]" 
                               : catIndex % 2 === 1 
                                 ? "bg-slate-50/30 hover:bg-blue-50/30 border-l-2 border-l-transparent" 
                                 : "hover:bg-blue-50/30 border-l-2 border-l-transparent"

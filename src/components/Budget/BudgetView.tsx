@@ -37,6 +37,43 @@ export default function BudgetView({
     setGroups(initialData?.categoryGroups || [])
   }, [initialData])
 
+  const visibleRows = React.useMemo(() => {
+    const rows: string[] = []
+    groups.forEach((g: any) => {
+      rows.push(g.id)
+      if (g.isExpanded) {
+        g.categories.forEach((c: any) => rows.push(c.id))
+      }
+    })
+    return rows
+  }, [groups])
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault()
+        if (!selectedCategoryId) {
+           setSelectedCategoryId(visibleRows[0])
+           return
+        }
+        
+        const currentIndex = visibleRows.indexOf(selectedCategoryId)
+        if (currentIndex === -1) return
+        
+        if (e.key === 'ArrowUp' && currentIndex > 0) {
+          setSelectedCategoryId(visibleRows[currentIndex - 1])
+        } else if (e.key === 'ArrowDown' && currentIndex < visibleRows.length - 1) {
+          setSelectedCategoryId(visibleRows[currentIndex + 1])
+        }
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [selectedCategoryId, visibleRows])
+
   const performUpdate = async (categoryId: string, newAssignedCents: number) => {
     // Optimistic Update
     setGroups((prevGroups: any[]) => prevGroups.map((g: any) => ({
