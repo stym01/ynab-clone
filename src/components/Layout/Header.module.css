@@ -1,0 +1,72 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  min-height: 80px;
+}
+
+.monthSelector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.arrowBtn {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease;
+}
+
+.arrowBtn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.monthTitle {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--brand-blue);
+  margin: 0;
+}
+
+.readyToAssign {
+  background-color: var(--status-positive);
+  color: #fff;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px; /* Pill shape */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  min-width: 200px;
+  transition: transform 0.1s ease;
+}
+
+.readyToAssign:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.amount {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.label {
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  opacity: 0.9;
+}

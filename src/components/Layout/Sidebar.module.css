@@ -1,0 +1,125 @@
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-sidebar);
+  color: var(--text-sidebar);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.2s ease;
+  border-right: 1px solid rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.sidebar.collapsed {
+  width: 60px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.budgetSelect {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.budgetName {
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdownBtn {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.75rem;
+}
+
+.collapseBtn {
+  color: rgba(255,255,255,0.7);
+  font-size: var(--font-size-xl);
+  padding: 0 0.25rem;
+}
+
+.collapseBtn:hover {
+  color: #fff;
+}
+
+.nav {
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  gap: 0.75rem;
+  color: rgba(255,255,255,0.8);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navItem:hover {
+  background-color: var(--bg-sidebar-hover);
+  color: #fff;
+}
+
+.navItem.active {
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+  border-left: 4px solid #fff;
+  padding-left: calc(1rem - 4px);
+}
+
+.icon {
+  font-size: 1.25rem;
+  width: 24px;
+  text-align: center;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.accountsSection {
+  margin-top: 1rem;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.05em;
+}
+
+.addAccountBtn {
+  width: calc(100% - 2rem);
+  margin: 1rem;
+  padding: 0.5rem;
+  background-color: rgba(255,255,255,0.1);
+  color: #fff;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  transition: background-color 0.15s ease;
+}
+
+.addAccountBtn:hover {
+  background-color: rgba(255,255,255,0.2);
+}

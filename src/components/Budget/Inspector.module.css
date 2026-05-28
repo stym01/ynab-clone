@@ -1,0 +1,141 @@
+.emptyState {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.inspector {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.categoryName {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: -1rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sectionTitle {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.autoAssignBtn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.autoAssignBtn:hover {
+  background-color: #F0F9FF; /* Light blue on hover */
+  border-color: #BAE6FD;
+}
+
+.btnLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.btnAmount {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--status-positive);
+}
+
+.targetCard {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.targetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.targetType {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.editBtn {
+  font-size: var(--font-size-xs);
+  color: var(--brand-blue);
+  font-weight: 600;
+}
+
+.editBtn:hover {
+  text-decoration: underline;
+}
+
+.targetAmount {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.progressText {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.targetActions {
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.snoozeBtn {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.15s;
+}
+
+.snoozeBtn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}

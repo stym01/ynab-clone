@@ -1,0 +1,141 @@
+.tableContainer {
+  padding: 0 1.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.colCategory {
+  width: 40%;
+  text-align: left;
+}
+
+.colNumber {
+  width: 20%;
+  text-align: right;
+}
+
+/* Master Group Row */
+.groupRow {
+  background-color: var(--bg-secondary);
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+}
+
+.groupRow td {
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.groupNameCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.caret {
+  font-size: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/* Category Row */
+.categoryRow {
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.categoryRow:hover {
+  background-color: var(--bg-secondary);
+}
+
+.categoryRow.selected {
+  background-color: #E0F2FE; /* Light blue highlight */
+}
+
+.categoryNameCell {
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Progress Bar */
+.progressBarBg {
+  width: 100%;
+  height: 4px;
+  background-color: #E5E7EB;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: var(--status-positive);
+  border-radius: 2px;
+}
+
+/* Editable Cell */
+.editableCell {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.categoryRow:hover .editableCell {
+  border-color: var(--border-color);
+  background-color: #fff;
+}
+
+.inlineInput {
+  width: 100%;
+  text-align: right;
+  padding: 0.25rem 0.5rem;
+  border: 2px solid var(--brand-blue);
+  border-radius: 4px;
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  outline: none;
+}
+
+.activityValue {
+  color: var(--text-secondary);
+}
+
+/* Available Pill */
+.availablePill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  min-width: 80px;
+  text-align: center;
+}
+
+.availablePill.positive {
+  background-color: var(--status-positive);
+  color: white;
+}
+
+.availablePill.negative {
+  background-color: var(--status-negative);
+  color: white;
+}
+
+.availablePill.neutral {
+  background-color: var(--status-neutral-bg);
+  color: var(--text-secondary);
+}

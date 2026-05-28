@@ -1,0 +1,201 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- NextAuth Standard Models ---
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+  refresh_token_expires_in Int?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // For credentials provider
+  accounts      Account[]
+  sessions      Session[]
+  budgets       Budget[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- YNAB Clone Models ---
+
+model Budget {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  accounts       FinancialAccount[]
+  categoryGroups CategoryGroup[]
+  payees         Payee[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FinancialAccount {
+  id        String   @id @default(cuid())
+  budgetId  String
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  name      String
+  type      String   // e.g., 'checking', 'savings', 'creditCard'
+  balance   Float      // Stored in cents, using Float to prevent overflow
+  isClosed  Boolean  @default(false)
+  
+  syncProvider String?  // e.g., 'ICICI_GMAIL'
+  historyId    String?  // To track Gmail push state
+
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CategoryGroup {
+  id        String   @id @default(cuid())
+  budgetId  String
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  name      String
+  sortOrder Int      @default(0)
+  isHidden  Boolean  @default(false)
+  
+  categories Category[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  groupId     String
+  group       CategoryGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  name        String
+  
+  target      Float    @default(0)
+  targetType  String   @default("NEEDED_FOR_SPENDING")
+  targetCadence String?  // "WEEKLY" | "MONTHLY" | "YEARLY" | "BY_DATE"
+  targetDay     Int?     // Day of week (1-7) or day of month (1-31)
+  targetMonth   Int?     // Month (1-12) for YEARLY
+  targetDate    DateTime? // Specific date for BY_DATE
+  sortOrder   Int      @default(0)
+  isHidden    Boolean  @default(false)
+
+  transactions Transaction[]
+  subTransactions SubTransaction[]
+  monthlyBudgets MonthlyBudget[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MonthlyBudget {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  month       String   // Format: "YYYY-MM"
+  assigned    Float    @default(0)
+  snoozed     Boolean  @default(false)
+  note        String?  // Per-category per-month notes
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([categoryId, month])
+}
+
+model Payee {
+  id        String   @id @default(cuid())
+  budgetId  String
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  
+  name      String
+  
+  transactions Transaction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  accountId   String
+  account     FinancialAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  payeeId     String?
+  payee       Payee?    @relation(fields: [payeeId], references: [id], onDelete: SetNull)
+  
+  date        DateTime
+  amount      Float      // Inflow > 0, Outflow < 0, in paise
+  memo        String?
+  cleared     Boolean  @default(false)
+  flagColor   String?  // "red" | "orange" | "yellow" | "green" | "blue" | "purple" | null
+  
+  transferId  String?    @unique
+  transfer    Transaction? @relation("TransferRelation", fields: [transferId], references: [id], onDelete: SetNull)
+  transferTo  Transaction? @relation("TransferRelation")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subTransactions SubTransaction[]
+}
+
+model SubTransaction {
+  id            String   @id @default(cuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  amount        Float      // In cents
+  memo          String?
+}

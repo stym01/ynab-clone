@@ -1,0 +1,47 @@
+.budgetContainer {
+  display: flex;
+  flex: 1;
+  height: calc(100vh - 80px); /* 80px is Header height */
+  overflow: hidden;
+}
+
+.tableArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  background-color: var(--bg-primary);
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+}
+
+.toolbarBtn {
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.toolbarBtn:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: #D1D5DB;
+}
+
+.inspectorArea {
+  width: 320px;
+  background-color: var(--bg-secondary);
+  overflow-y: auto;
+  flex-shrink: 0;
+}
