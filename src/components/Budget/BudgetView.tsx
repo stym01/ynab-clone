@@ -30,6 +30,7 @@ export default function BudgetView({
   
   const [isAddingCategoryGroup, setIsAddingCategoryGroup] = useState(false)
   const [newCategoryGroupName, setNewCategoryGroupName] = useState("")
+  const [showProgressBars, setShowProgressBars] = useState(false)
 
   const [past, setPast] = useState<{ categoryId: string, amount: number }[]>([])
   const [future, setFuture] = useState<{ categoryId: string, amount: number }[]>([])
@@ -390,20 +391,31 @@ export default function BudgetView({
             >
               <Redo2 size={16} /> Redo
             </button>
-            <button 
-              className="text-[14px] font-bold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5"
-            >
-              <History size={16} /> Recent Moves
-            </button>
           </div>
           
-          <div className="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200 shadow-sm">
-            <button className="px-2.5 py-1.5 bg-[#E4E4E0] shadow-sm rounded-md text-slate-600">
-              <AlignJustify size={16} />
-            </button>
-            <button className="px-2.5 py-1.5 rounded-md text-slate-400 hover:text-slate-600 transition-colors">
-              <List size={16} />
-            </button>
+          <div className="relative group flex items-center">
+            <div className="flex items-center bg-[#F4F4F4] rounded-lg p-0.5 border border-slate-200 shadow-sm">
+              <button 
+                onClick={() => setShowProgressBars(true)}
+                className={`px-2.5 py-1.5 rounded-md transition-all ${showProgressBars ? 'bg-white shadow-sm text-slate-700' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                <div className="flex flex-col gap-0.5 items-center justify-center h-4 w-4">
+                  <div className="w-3 h-1 bg-current rounded-sm"></div>
+                  <div className="w-3 h-1 bg-current rounded-sm"></div>
+                </div>
+              </button>
+              <button 
+                onClick={() => setShowProgressBars(false)}
+                className={`px-2.5 py-1.5 rounded-md transition-all ${!showProgressBars ? 'bg-white shadow-sm text-slate-700' : 'text-slate-400 hover:text-slate-600'}`}
+              >
+                <List size={16} />
+              </button>
+            </div>
+            
+            {/* Tooltip */}
+            <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity bg-[#1A1A1A] text-white text-xs font-semibold py-1.5 px-3 rounded-md whitespace-nowrap shadow-md z-50">
+              {showProgressBars ? 'Progress Bars On' : 'Progress Bars Off'}
+            </div>
           </div>
         </div>
         
@@ -429,6 +441,7 @@ export default function BudgetView({
           onSelectCategory={setSelectedCategoryId}
           onUpdateAssigned={handleUpdateAssigned}
           onMoveMoney={handleMoveMoney}
+          showProgressBars={showProgressBars}
           onAvailableClick={(categoryId) => {
             setMoveMoneyInitialFrom(categoryId)
             setIsMoveMoneyOpen(true)

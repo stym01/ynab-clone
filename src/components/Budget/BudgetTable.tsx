@@ -14,10 +14,11 @@ interface BudgetTableProps {
   onUpdateAssigned: (categoryId: string, amount: number) => Promise<void>
   onAvailableClick?: (categoryId: string) => void
   onMoveMoney?: (amountCents: number, fromId: string, toId: string) => Promise<void>
+  showProgressBars?: boolean
 }
 
 export default function BudgetTable({ 
-  groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney
+  groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney, showProgressBars
 }: BudgetTableProps) {
   
   const [editValue, setEditValue] = useState<string>("")
@@ -304,6 +305,34 @@ export default function BudgetTable({
                                     transition={{ duration: 0.5, ease: "easeOut" }}
                                     className={`h-full rounded-full ${category.available >= category.target ? 'bg-[#23B573]' : 'bg-[#E8A317]'}`}
                                   />
+                                </div>
+                              )}
+                              {showProgressBars && (
+                                <div className="h-[4px] bg-[#EAE8E3] rounded-full mt-1 overflow-hidden ml-[22px]" style={{ width: 'calc(100% - 22px)' }}>
+                                  {(() => {
+                                    const budget = category.assigned || 0
+                                    const spent = Math.abs(category.activity || 0)
+                                    let progress = 0
+                                    let isOverspent = false
+                                    
+                                    if (budget > 0) {
+                                      progress = (spent / budget) * 100
+                                      if (progress > 100) {
+                                        progress = 100
+                                        isOverspent = true
+                                      }
+                                    } else if (spent > 0) {
+                                      progress = 100
+                                      isOverspent = true
+                                    }
+
+                                    return progress > 0 ? (
+                                      <div 
+                                        className={`h-full rounded-full transition-all ${isOverspent ? 'bg-[#E54545]' : 'bg-[#76B928]'}`} 
+                                        style={{ width: `${progress}%` }}
+                                      />
+                                    ) : null
+                                  })()}
                                 </div>
                               )}
                             </div>
