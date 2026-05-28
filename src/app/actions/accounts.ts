@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 import { requireUser } from "@/lib/session"
 import { revalidatePath } from "next/cache"
+import { cookies } from "next/headers"
 import { enableGmailWatch } from "./bankSync"
 
 export async function createAccount(name: string, type: string, startingBalanceCents: number) {
