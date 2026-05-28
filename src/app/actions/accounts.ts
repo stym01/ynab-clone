@@ -466,3 +466,15 @@ export async function closeAccount(accountId: string) {
 
   revalidatePath("/")
 }
+
+export async function deleteAccount(accountId: string) {
+  const user = await requireUser()
+  const account = await prisma.financialAccount.findUnique({ where: { id: accountId }, include: { budget: true } })
+  if (!account || account.budget.userId !== user.id) throw new Error("Unauthorized")
+
+  await prisma.financialAccount.delete({
+    where: { id: accountId }
+  })
+
+  revalidatePath("/")
+}

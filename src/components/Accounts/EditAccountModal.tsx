@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { updateAccount, closeAccount } from "@/app/actions/accounts"
+import { updateAccount, closeAccount, deleteAccount } from "@/app/actions/accounts"
 import { motion } from "framer-motion"
 import { X } from "lucide-react"
 
@@ -35,6 +35,19 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
     setIsClosing(true)
     try {
       await closeAccount(account.id)
+      onClose()
+    } catch (err) {
+      console.error(err)
+      setIsClosing(false)
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you ABSOLUTELY sure you want to completely DELETE this account? This will permanently erase all its transactions! This action cannot be undone.")) return
+    
+    setIsClosing(true)
+    try {
+      await deleteAccount(account.id)
       onClose()
     } catch (err) {
       console.error(err)
@@ -96,14 +109,24 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
           </div>
           
           <div className="flex justify-between items-center mt-2 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              onClick={handleCloseAccount}
-              disabled={isClosing}
-              className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors disabled:opacity-50"
-            >
-              {isClosing ? "Closing..." : "Close Account"}
-            </button>
+            <div className="flex gap-2">
+              <button 
+                type="button" 
+                onClick={handleCloseAccount}
+                disabled={isClosing}
+                className="px-4 py-2 text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-md transition-colors disabled:opacity-50"
+              >
+                {isClosing ? "Closing..." : "Close Account"}
+              </button>
+              <button 
+                type="button" 
+                onClick={handleDeleteAccount}
+                disabled={isClosing}
+                className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors disabled:opacity-50"
+              >
+                Delete Account
+              </button>
+            </div>
 
             <div className="flex gap-3">
               <button 
