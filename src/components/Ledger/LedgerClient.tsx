@@ -305,7 +305,7 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
         <div className="flex gap-6">
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cleared</span>
-            <span className="text-lg font-semibold text-[#23B573] tabular-nums">{formatCurrency(clearedBalance)}</span>
+            <span className={`text-lg font-semibold tabular-nums ${clearedBalance < 0 ? 'text-[#E54545]' : clearedBalance > 0 ? 'text-[#23B573]' : 'text-slate-700'}`}>{formatCurrency(clearedBalance)}</span>
           </div>
           <div className="flex flex-col items-end">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Uncleared</span>
@@ -313,7 +313,7 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
           </div>
           <div className="flex flex-col items-end pl-4 border-l border-slate-200">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Working</span>
-            <span className="text-lg font-bold text-slate-800 tabular-nums">{formatCurrency(account.balance)}</span>
+            <span className={`text-lg font-bold tabular-nums ${account.balance < 0 ? 'text-[#E54545]' : account.balance > 0 ? 'text-[#23B573]' : 'text-slate-800'}`}>{formatCurrency(account.balance)}</span>
           </div>
         </div>
       </div>
