@@ -14,7 +14,7 @@ export default function LoginPage() {
           <button 
             type="button" 
             onClick={() => signIn("google", { callbackUrl: "/budget" })}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-slate-300 rounded-lg shadow-sm bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 transition-colors font-semibold text-lg"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border border-slate-300 rounded-lg shadow-sm bg-white text-slate-700 hover:bg-slate-50 transition-colors font-semibold text-lg"
           >
             <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -26,7 +26,7 @@ export default function LoginPage() {
           </button>
         </div>
         
-        <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 leading-relaxed">
+        <p className="mt-6 text-center text-sm text-slate-500 leading-relaxed">
           We use Google to securely authenticate you. <br/>
           No passwords to remember.
         </p>

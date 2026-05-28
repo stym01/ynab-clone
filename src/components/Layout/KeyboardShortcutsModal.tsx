@@ -10,21 +10,21 @@ interface KeyboardShortcutsModalProps {
 
 const ShortcutSection = ({ title, items, className = "" }: { title: string, items: any[], className?: string }) => (
   <div className={`flex flex-col gap-3 mb-8 ${className}`}>
-    <h3 className="font-bold text-slate-800 dark:text-slate-200 text-base">{title}</h3>
+    <h3 className="font-bold text-slate-800 text-base">{title}</h3>
     <div className="flex flex-col gap-2">
       {items.map((item, idx) => (
-        <div key={idx} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
-          <span className="text-sm text-slate-700 dark:text-slate-300">{item.label}</span>
+        <div key={idx} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
+          <span className="text-sm text-slate-700">{item.label}</span>
           <div className="flex items-center gap-1.5">
-            {item.preText && <span className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mr-1">{item.preText}</span>}
+            {item.preText && <span className="text-sm text-slate-500 mr-1">{item.preText}</span>}
             {item.keys.map((k: string, i: number) => (
-              <kbd key={i} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-semibold text-slate-700 dark:text-slate-300 min-w-[24px] text-center shadow-sm">
+              <kbd key={i} className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-semibold text-slate-700 min-w-[24px] text-center shadow-sm">
                 {k}
               </kbd>
             ))}
-            {item.postText && <span className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mx-1">{item.postText}</span>}
+            {item.postText && <span className="text-sm text-slate-500 mx-1">{item.postText}</span>}
             {item.additionalKeys?.map((k: string, i: number) => (
-              <kbd key={`add-${i}`} className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-xs font-semibold text-slate-700 dark:text-slate-300 min-w-[24px] text-center shadow-sm">
+              <kbd key={`add-${i}`} className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-xs font-semibold text-slate-700 min-w-[24px] text-center shadow-sm">
                 {k}
               </kbd>
             ))}
@@ -50,10 +50,10 @@ export default function KeyboardShortcutsModal({ onClose }: KeyboardShortcutsMod
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.2 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl flex flex-col w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        className="bg-white rounded-xl shadow-2xl flex flex-col w-full max-w-4xl max-h-[90vh] overflow-hidden"
       >
-        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 sticky top-0 z-10">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Keyboard Shortcuts</h2>
+        <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 bg-white sticky top-0 z-10">
+          <h2 className="text-xl font-bold text-slate-800">Keyboard Shortcuts</h2>
           <button 
             onClick={onClose}
             className="p-2 text-[#005A87] hover:bg-blue-50 rounded-md transition-colors"
@@ -62,7 +62,7 @@ export default function KeyboardShortcutsModal({ onClose }: KeyboardShortcutsMod
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 bg-white dark:bg-slate-900 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-6 bg-white custom-scrollbar">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
             
             {/* Left Column */}

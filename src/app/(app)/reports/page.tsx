@@ -142,11 +142,11 @@ export default async function ReportsPage() {
   const ageOfMoney = last10Ages.length > 0 ? Math.round(last10Ages.reduce((a, b) => a + b, 0) / last10Ages.length) : 0
 
   return (
-    <div className="flex-1 overflow-auto bg-slate-50 dark:bg-slate-800">
+    <div className="flex-1 overflow-auto bg-slate-50">
       <div className="p-8 max-w-6xl mx-auto flex flex-col gap-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-200">Reports</h1>
-          <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-2">Visualize your financial progress and spending habits.</p>
+          <h1 className="text-3xl font-bold text-slate-800">Reports</h1>
+          <p className="text-slate-500 mt-2">Visualize your financial progress and spending habits.</p>
         </div>
 
         <NetWorthChart data={netWorthData} />
@@ -159,28 +159,28 @@ export default async function ReportsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2">
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col items-center justify-center h-48">
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Age of Money</div>
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col items-center justify-center h-48">
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-2">Age of Money</div>
             <div className="text-5xl font-bold text-[#23B573]">
-              {ageOfMoney} <span className="text-xl text-slate-400 dark:text-slate-500 font-medium">days</span>
+              {ageOfMoney} <span className="text-xl text-slate-400 font-medium">days</span>
             </div>
-            <p className="text-sm text-slate-400 dark:text-slate-500 mt-2 text-center">
+            <p className="text-sm text-slate-400 mt-2 text-center">
               {ageOfMoney > 30 ? "Your money is aging perfectly!" : "Try to get this above 30 days!"}
             </p>
           </div>
           
           {/* Top Spending Category — Real Data */}
-          <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-center h-48">
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">Top Spending Categories</div>
+          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-center h-48">
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-widest mb-4">Top Spending Categories</div>
             {topSpending.length > 0 ? (
               topSpending.slice(0, 3).map((cat, i) => (
-                <div key={i} className={`flex justify-between items-center ${i < 2 ? 'border-b border-slate-100 dark:border-slate-800 pb-2 mb-2' : ''}`}>
-                  <span className="font-semibold text-slate-700 dark:text-slate-300">{cat.name}</span>
-                  <span className="font-bold text-slate-800 dark:text-slate-200">{formatCurrency(cat.total)}</span>
+                <div key={i} className={`flex justify-between items-center ${i < 2 ? 'border-b border-slate-100 pb-2 mb-2' : ''}`}>
+                  <span className="font-semibold text-slate-700">{cat.name}</span>
+                  <span className="font-bold text-slate-800">{formatCurrency(cat.total)}</span>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-slate-400 dark:text-slate-500">No spending data yet. Add transactions to see your top categories.</p>
+              <p className="text-sm text-slate-400">No spending data yet. Add transactions to see your top categories.</p>
             )}
           </div>
         </div>

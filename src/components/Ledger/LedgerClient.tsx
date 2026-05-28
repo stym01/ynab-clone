@@ -326,11 +326,11 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
   )
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 flex-1 overflow-hidden">
+    <div className="flex flex-col h-full bg-white flex-1 overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 z-10">
+      <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 bg-white z-10">
         <div className="flex flex-col gap-2">
-          <h1 className="text-xl font-bold text-slate-800 dark:text-slate-200">{account.name}</h1>
+          <h1 className="text-xl font-bold text-slate-800">{account.name}</h1>
           <div className="flex gap-2">
             <button 
               onClick={() => setIsAdding(true)}
@@ -340,7 +340,7 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
             </button>
             <button 
               onClick={() => setIsReconciling(true)}
-              className="px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 transition-all shadow-sm"
+              className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-all shadow-sm"
             >
               Reconcile
             </button>
@@ -348,34 +348,34 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
         </div>
         <div className="flex gap-6">
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Cleared</span>
-            <span className={`text-lg font-semibold tabular-nums ${clearedBalance < 0 ? 'text-[#E54545]' : clearedBalance > 0 ? 'text-[#23B573]' : 'text-slate-700 dark:text-slate-300'}`}>{formatCurrency(clearedBalance)}</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Cleared</span>
+            <span className={`text-lg font-semibold tabular-nums ${clearedBalance < 0 ? 'text-[#E54545]' : clearedBalance > 0 ? 'text-[#23B573]' : 'text-slate-700'}`}>{formatCurrency(clearedBalance)}</span>
           </div>
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Uncleared</span>
-            <span className="text-lg font-medium text-slate-400 dark:text-slate-500 tabular-nums">{formatCurrency(unclearedBalance)}</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Uncleared</span>
+            <span className="text-lg font-medium text-slate-400 tabular-nums">{formatCurrency(unclearedBalance)}</span>
           </div>
-          <div className="flex flex-col items-end pl-4 border-l border-slate-200 dark:border-slate-700">
-            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Working</span>
-            <span className={`text-lg font-bold tabular-nums ${account.balance < 0 ? 'text-[#E54545]' : account.balance > 0 ? 'text-[#23B573]' : 'text-slate-800 dark:text-slate-200'}`}>{formatCurrency(account.balance)}</span>
+          <div className="flex flex-col items-end pl-4 border-l border-slate-200">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Working</span>
+            <span className={`text-lg font-bold tabular-nums ${account.balance < 0 ? 'text-[#E54545]' : account.balance > 0 ? 'text-[#23B573]' : 'text-slate-800'}`}>{formatCurrency(account.balance)}</span>
           </div>
         </div>
       </div>
 
       {/* Search / Bulk Actions Bar */}
-      <div className="flex items-center gap-3 px-6 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+      <div className="flex items-center gap-3 px-6 py-2 border-b border-slate-100 bg-slate-50/50">
         <div className="relative flex-1 max-w-sm">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search transactions..."
-            className="w-full pl-9 pr-8 py-1.5 text-sm border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] bg-white dark:bg-slate-900"
+            className="w-full pl-9 pr-8 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] bg-white"
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 dark:text-slate-400 dark:text-slate-500">
+            <button onClick={() => setSearchQuery("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
               <X size={14} />
             </button>
           )}
@@ -386,11 +386,11 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2"
           >
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500">{selectedIds.size} selected</span>
+            <span className="text-xs font-semibold text-slate-500">{selectedIds.size} selected</span>
             <button onClick={handleBulkDelete} className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-red-600 bg-red-50 rounded-md hover:bg-red-100 transition-colors">
               <Trash2 size={12} /> Delete
             </button>
-            <button onClick={() => setSelectedIds(new Set())} className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 dark:text-slate-400 dark:text-slate-500">Clear</button>
+            <button onClick={() => setSelectedIds(new Set())} className="text-xs text-slate-400 hover:text-slate-600">Clear</button>
           </motion.div>
         )}
       </div>
@@ -398,7 +398,7 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
       {/* Ledger Table */}
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm text-left">
-          <thead className="text-[11px] text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase bg-white dark:bg-slate-900 sticky top-0 border-b border-slate-200 dark:border-slate-700 z-10">
+          <thead className="text-[11px] text-slate-500 uppercase bg-white sticky top-0 border-b border-slate-200 z-10">
             <tr>
               <th className="px-3 py-2.5 font-semibold w-8"></th>
               <th className="px-3 py-2.5 font-semibold w-8 text-center">
@@ -439,10 +439,10 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                       <div className="w-5 h-5 rounded-full border-2 border-slate-300 mx-auto flex items-center justify-center text-[10px] font-bold text-slate-300">U</div>
                     </td>
                     <td className="px-3 py-2">
-                      <input type="date" value={date} onChange={e => setDate(e.target.value)} onKeyDown={handleDateKeyDown} className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] text-sm bg-white dark:bg-slate-900" />
+                      <input type="date" value={date} onChange={e => setDate(e.target.value)} onKeyDown={handleDateKeyDown} className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] text-sm bg-white" />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="text" value={payeeName} onChange={e => setPayeeName(e.target.value)} list="payees-list" placeholder="Payee" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] bg-white dark:bg-slate-900" />
+                      <input type="text" value={payeeName} onChange={e => setPayeeName(e.target.value)} list="payees-list" placeholder="Payee" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] bg-white" />
                       <datalist id="payees-list">{payees.map(p => <option key={p.id} value={p.name} />)}</datalist>
                     </td>
                     <td className="px-3 py-2">
@@ -450,22 +450,22 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                         value={payeeName.startsWith("Transfer: ") ? "" : categoryId}
                         onChange={(e: any) => setCategoryId(e.target.value)}
                         disabled={payeeName.startsWith("Transfer: ")}
-                        className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] disabled:bg-slate-100 dark:bg-slate-800 disabled:text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900"
+                        className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] disabled:bg-slate-100 disabled:text-slate-400 bg-white"
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="text" value={memo} onChange={e => setMemo(e.target.value)} placeholder="Memo" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] bg-white dark:bg-slate-900" />
+                      <input type="text" value={memo} onChange={e => setMemo(e.target.value)} placeholder="Memo" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 focus:border-[#005A87] bg-white" />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="number" step="0.01" value={outflow} onChange={e => { setOutflow(e.target.value); setInflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 text-right bg-white dark:bg-slate-900" />
+                      <input type="number" step="0.01" value={outflow} onChange={e => { setOutflow(e.target.value); setInflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 text-right bg-white" />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="number" step="0.01" value={inflow} onChange={e => { setInflow(e.target.value); setOutflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 text-right bg-white dark:bg-slate-900" />
+                      <input type="number" step="0.01" value={inflow} onChange={e => { setInflow(e.target.value); setOutflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005A87]/20 text-right bg-white" />
                     </td>
                     <td className="px-3 py-2">
                       {categoryId !== "SPLIT" && (
                         <div className="flex gap-1.5 justify-end">
-                          <button onClick={() => setIsAdding(false)} className="px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 dark:bg-slate-700 transition-colors">Cancel</button>
+                          <button onClick={() => setIsAdding(false)} className="px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors">Cancel</button>
                           <button onClick={handleSaveTransaction} className="px-3 py-1 text-xs font-medium text-white bg-[#23B573] rounded-md hover:bg-[#1da366] transition-colors shadow-sm">Save</button>
                         </div>
                       )}
@@ -474,10 +474,10 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
 
                   {/* Split Rows */}
                   {categoryId === "SPLIT" && splits.map((split, index) => (
-                    <tr key={`split-${index}`} className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800">
+                    <tr key={`split-${index}`} className="bg-slate-50/80 border-b border-slate-100">
                       <td colSpan={5}></td>
                       <td className="px-3 py-1.5">
-                        <select value={split.categoryId} onChange={e => { const ns = [...splits]; ns[index].categoryId = e.target.value; setSplits(ns) }} className="w-full px-2 py-1 border border-slate-200 dark:border-slate-700 rounded text-xs bg-white dark:bg-slate-900">
+                        <select value={split.categoryId} onChange={e => { const ns = [...splits]; ns[index].categoryId = e.target.value; setSplits(ns) }} className="w-full px-2 py-1 border border-slate-200 rounded text-xs bg-white">
                           <option value="">Ready to Assign</option>
                           {Object.entries(categoriesByGroup).map(([groupId, cats]: [string, any]) => (
                             <optgroup key={groupId} label={cats[0].group?.name || 'Group'}>
@@ -487,10 +487,10 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                         </select>
                       </td>
                       <td className="px-3 py-1.5">
-                        <input type="text" value={split.memo} onChange={e => { const ns = [...splits]; ns[index].memo = e.target.value; setSplits(ns) }} placeholder="Split memo" className="w-full px-2 py-1 border border-slate-200 dark:border-slate-700 rounded text-xs bg-white dark:bg-slate-900" />
+                        <input type="text" value={split.memo} onChange={e => { const ns = [...splits]; ns[index].memo = e.target.value; setSplits(ns) }} placeholder="Split memo" className="w-full px-2 py-1 border border-slate-200 rounded text-xs bg-white" />
                       </td>
                       <td className="px-3 py-1.5">
-                        <input type="number" step="0.01" value={split.amount} onChange={e => { const ns = [...splits]; ns[index].amount = e.target.value; setSplits(ns) }} className="w-full px-2 py-1 border border-slate-200 dark:border-slate-700 rounded text-right text-xs bg-white dark:bg-slate-900" />
+                        <input type="number" step="0.01" value={split.amount} onChange={e => { const ns = [...splits]; ns[index].amount = e.target.value; setSplits(ns) }} className="w-full px-2 py-1 border border-slate-200 rounded text-right text-xs bg-white" />
                       </td>
                       <td className="px-3 py-1.5">
                         {index === splits.length - 1 && (
@@ -518,30 +518,30 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                       <div className={`w-5 h-5 rounded-full border-2 mx-auto flex items-center justify-center text-[10px] font-bold cursor-pointer ${t.cleared ? 'border-[#23B573] text-[#23B573] bg-[#23B573]/10' : 'border-slate-300 text-slate-300'}`}>{t.cleared ? '✓' : ''}</div>
                     </td>
                     <td className="px-3 py-2">
-                      <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-sm bg-white dark:bg-slate-900" />
+                      <input type="date" value={editDate} onChange={e => setEditDate(e.target.value)} className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 text-sm bg-white" />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="text" value={editPayeeName} onChange={e => setEditPayeeName(e.target.value)} list="payees-list" placeholder="Payee" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white dark:bg-slate-900" />
+                      <input type="text" value={editPayeeName} onChange={e => setEditPayeeName(e.target.value)} list="payees-list" placeholder="Payee" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white" />
                     </td>
                     <td className="px-3 py-2">
                       <CategorySelect 
                         value={editCategoryId}
                         onChange={(e: any) => setEditCategoryId(e.target.value)}
-                        className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white dark:bg-slate-900"
+                        className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white"
                       />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="text" value={editMemo} onChange={e => setEditMemo(e.target.value)} placeholder="Memo" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white dark:bg-slate-900" />
+                      <input type="text" value={editMemo} onChange={e => setEditMemo(e.target.value)} placeholder="Memo" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 bg-white" />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="number" step="0.01" value={editOutflow} onChange={e => { setEditOutflow(e.target.value); setEditInflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-right bg-white dark:bg-slate-900" />
+                      <input type="number" step="0.01" value={editOutflow} onChange={e => { setEditOutflow(e.target.value); setEditInflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-right bg-white" />
                     </td>
                     <td className="px-3 py-2">
-                      <input type="number" step="0.01" value={editInflow} onChange={e => { setEditInflow(e.target.value); setEditOutflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-right bg-white dark:bg-slate-900" />
+                      <input type="number" step="0.01" value={editInflow} onChange={e => { setEditInflow(e.target.value); setEditOutflow(""); }} placeholder="0.00" className="w-full px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500/20 text-right bg-white" />
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex gap-1.5 justify-end">
-                        <button onClick={() => setEditingTransactionId(null)} className="px-3 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800 rounded-md hover:bg-slate-200 dark:hover:bg-slate-700 dark:bg-slate-700 transition-colors">Cancel</button>
+                        <button onClick={() => setEditingTransactionId(null)} className="px-3 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors">Cancel</button>
                         <button onClick={handleSaveEdit} disabled={isEditSaving} className="px-3 py-1 text-xs font-medium text-white bg-amber-500 rounded-md hover:bg-amber-600 transition-colors shadow-sm disabled:opacity-50">Save</button>
                       </div>
                     </td>
@@ -550,19 +550,19 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                   <tr 
                     onDoubleClick={() => startEditing(t)}
                     onContextMenu={(e) => { e.preventDefault(); startEditing(t); }}
-                    className={`group cursor-pointer transition-all border-b border-slate-50 dark:border-slate-800/50 ${
+                    className={`group cursor-pointer transition-all border-b border-slate-50 ${
                       selectedIds.has(t.id) 
                         ? 'bg-blue-50/60' 
                         : index % 2 === 0 
-                          ? 'bg-white dark:bg-slate-900 hover:bg-slate-50/80 dark:hover:bg-slate-800/80 dark:bg-slate-800/80' 
-                          : 'bg-[#FAFBFC] hover:bg-slate-50/80 dark:hover:bg-slate-800/80 dark:bg-slate-800/80'
+                          ? 'bg-white hover:bg-slate-50/80' 
+                          : 'bg-[#FAFBFC] hover:bg-slate-50/80'
                     }`}
                   >
                   {/* Flag */}
                   <td className="px-3 py-2 relative">
                     <button
                       onClick={() => setFlagMenuId(flagMenuId === t.id ? null : t.id)}
-                      className="w-5 h-5 flex items-center justify-center rounded hover:bg-slate-100 dark:hover:bg-slate-800 dark:bg-slate-800 transition-colors"
+                      className="w-5 h-5 flex items-center justify-center rounded hover:bg-slate-100 transition-colors"
                     >
                       {t.flagColor ? (
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: FLAG_COLORS.find(f => f.name === t.flagColor)?.color || '#94A3B8' }} />
@@ -577,13 +577,13 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.9 }}
-                          className="absolute left-8 top-0 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 p-2 z-50 flex gap-1.5"
+                          className="absolute left-8 top-0 bg-white rounded-lg shadow-xl border border-slate-200 p-2 z-50 flex gap-1.5"
                         >
                           {FLAG_COLORS.map(f => (
                             <button key={f.name} onClick={async () => { await flagTransaction(t.id, f.name); setFlagMenuId(null) }} className="w-5 h-5 rounded-full hover:scale-110 transition-transform" style={{ backgroundColor: f.color }} />
                           ))}
                           <button onClick={async () => { await flagTransaction(t.id, null); setFlagMenuId(null) }} className="w-5 h-5 rounded-full border-2 border-dashed border-slate-300 hover:scale-110 transition-transform flex items-center justify-center">
-                            <X size={10} className="text-slate-400 dark:text-slate-500" />
+                            <X size={10} className="text-slate-400" />
                           </button>
                         </motion.div>
                       )}
@@ -608,8 +608,8 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                     </div>
                   </td>
                   
-                  <td className="px-3 py-2 text-slate-600 dark:text-slate-400 dark:text-slate-500 tabular-nums text-[13px]">{new Date(t.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}</td>
-                  <td className="px-3 py-2 font-medium text-slate-800 dark:text-slate-200 text-[13px]">{t.payee?.name || ''}</td>
+                  <td className="px-3 py-2 text-slate-600 tabular-nums text-[13px]">{new Date(t.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })}</td>
+                  <td className="px-3 py-2 font-medium text-slate-800 text-[13px]">{t.payee?.name || ''}</td>
                   <td className="px-3 py-2 text-[13px]">
                     {t.subTransactions?.length > 0 ? (
                       <span className="font-semibold text-[#005A87]">Split ({t.subTransactions.length})</span>
@@ -629,41 +629,41 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
                                 <option value="" disabled>⚠️ Category Needed</option>
                                 {Object.entries(categoriesByGroup).map(([groupId, cats]: [string, any]) => (
                                   <optgroup key={groupId} label={cats[0].group?.name || 'Group'}>
-                                    {cats.map((c: any) => <option key={c.id} value={c.id} className="text-slate-800 dark:text-slate-200 font-normal">{c.name}</option>)}
+                                    {cats.map((c: any) => <option key={c.id} value={c.id} className="text-slate-800 font-normal">{c.name}</option>)}
                                   </optgroup>
                                 ))}
                               </select>
                             )
-                          : <span className="text-slate-400 dark:text-slate-500 italic">Ready to Assign</span>
+                          : <span className="text-slate-400 italic">Ready to Assign</span>
                       )
                     )}
                   </td>
-                  <td className="px-3 py-2 text-slate-400 dark:text-slate-500 text-[13px] truncate max-w-[180px]">{t.memo}</td>
+                  <td className="px-3 py-2 text-slate-400 text-[13px] truncate max-w-[180px]">{t.memo}</td>
                   <td className="px-3 py-2 text-right font-medium text-[13px] tabular-nums">
                     {t.amount < 0 ? <span className="text-[#E54545]">{formatCurrency(Math.abs(t.amount))}</span> : ''}
                   </td>
                   <td className="px-3 py-2 text-right font-medium text-[13px] tabular-nums">
                     {t.amount >= 0 ? <span className="text-[#23B573]">{formatCurrency(t.amount)}</span> : ''}
                   </td>
-                  <td className="px-3 py-2 text-right font-medium text-slate-700 dark:text-slate-300 text-[13px] tabular-nums">
+                  <td className="px-3 py-2 text-right font-medium text-slate-700 text-[13px] tabular-nums">
                     {runningBalances[t.id] !== undefined ? formatCurrency(runningBalances[t.id]) : ''}
                   </td>
                 </tr>
                 )}
                 {/* Sub-transactions */}
                 {t.subTransactions?.map((st: any) => (
-                  <tr key={st.id} className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800/50 text-xs">
+                  <tr key={st.id} className="bg-slate-50/50 border-b border-slate-50 text-xs">
                     <td colSpan={5}></td>
-                    <td className="px-3 py-1.5 pl-6 text-slate-500 dark:text-slate-400 dark:text-slate-500 flex items-center gap-2">
+                    <td className="px-3 py-1.5 pl-6 text-slate-500 flex items-center gap-2">
                       <div className="w-px h-3 bg-slate-300 -ml-1"></div>
                       <div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div>
-                      {st.category?.name || <span className="italic text-slate-400 dark:text-slate-500">Ready to Assign</span>}
+                      {st.category?.name || <span className="italic text-slate-400">Ready to Assign</span>}
                     </td>
-                    <td className="px-3 py-1.5 text-slate-400 dark:text-slate-500 italic">{st.memo}</td>
-                    <td className="px-3 py-1.5 text-right text-slate-500 dark:text-slate-400 dark:text-slate-500 tabular-nums">
+                    <td className="px-3 py-1.5 text-slate-400 italic">{st.memo}</td>
+                    <td className="px-3 py-1.5 text-right text-slate-500 tabular-nums">
                       {st.amount < 0 ? formatCurrency(Math.abs(st.amount)) : ''}
                     </td>
-                    <td className="px-3 py-1.5 text-right text-slate-500 dark:text-slate-400 dark:text-slate-500 tabular-nums">
+                    <td className="px-3 py-1.5 text-right text-slate-500 tabular-nums">
                       {st.amount >= 0 ? formatCurrency(st.amount) : ''}
                     </td>
                     <td></td>

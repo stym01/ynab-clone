@@ -7,11 +7,10 @@ import { signOut } from "next-auth/react"
 import AddAccountModal from "../Accounts/AddAccountModal"
 import EditAccountModal from "../Accounts/EditAccountModal"
 import { motion, AnimatePresence } from "framer-motion"
-import { useTheme } from "next-themes"
 import { 
   ChevronDown, ChevronsLeft, ChevronsRight, PieChart, 
   Landmark, Wallet, CreditCard, PiggyBank, Plus, 
-  MoreHorizontal, Archive, Settings, LogOut, Pencil, Sun, Moon
+  MoreHorizontal, Archive, Settings, LogOut, Pencil
 } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
 
@@ -22,12 +21,6 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
   const [accountToEdit, setAccountToEdit] = useState<any>(null)
   const [isBudgetDropdownOpen, setIsBudgetDropdownOpen] = useState(false)
   const [showBudgetAccounts, setShowBudgetAccounts] = useState(true)
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
 
   React.useEffect(() => {
     if (externalCollapsed !== null && externalCollapsed !== undefined) {
@@ -87,9 +80,9 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                       initial={{ opacity: 0, y: -4, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.95 }}
-                      className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-lg shadow-xl py-2 z-50 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                      className="absolute top-full left-0 mt-2 w-56 bg-white rounded-lg shadow-xl py-2 z-50 text-slate-800 border border-slate-200"
                     >
-                      <div className="px-4 py-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Switch Budget</div>
+                      <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Switch Budget</div>
                       {budgets.map(b => (
                         <button 
                           key={b.id} 
@@ -98,12 +91,12 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                             await switchBudget(b.id)
                             setIsBudgetDropdownOpen(false)
                           }}
-                          className={`w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 text-sm font-medium ${b.id === activeBudget?.id ? 'text-[#005A87] bg-blue-50' : ''}`}
+                          className={`w-full text-left px-4 py-2 hover:bg-slate-50 text-sm font-medium ${b.id === activeBudget?.id ? 'text-[#005A87] bg-blue-50' : ''}`}
                         >
                           {b.name}
                         </button>
                       ))}
-                      <div className="border-t border-slate-100 dark:border-slate-800 mt-1 pt-1">
+                      <div className="border-t border-slate-100 mt-1 pt-1">
                         <button 
                           onClick={async () => {
                             const name = window.prompt("Enter new budget name:")
@@ -113,7 +106,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                               setIsBudgetDropdownOpen(false)
                             }
                           }}
-                          className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 dark:bg-slate-800 text-sm font-medium text-[#005A87]"
+                          className="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm font-medium text-[#005A87]"
                         >
                           + Create New Budget
                         </button>
@@ -134,15 +127,15 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
 
         {/* Navigation */}
         <nav className="flex flex-col py-3 gap-0.5">
-          <Link href="/budget" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/budget") ? "bg-white dark:bg-slate-900/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
+          <Link href="/budget" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/budget") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
             <Wallet size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>Budget</span>}
           </Link>
-          <Link href="/reports" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/reports") ? "bg-white dark:bg-slate-900/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
+          <Link href="/reports" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/reports") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
             <PieChart size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>Reports</span>}
           </Link>
-          <Link href="/accounts" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/accounts") ? "bg-white dark:bg-slate-900/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
+          <Link href="/accounts" className={`flex items-center px-4 py-2.5 transition-all text-sm ${isActive("/accounts") ? "bg-white/10 border-l-3 border-[#23B573] text-white font-semibold" : "border-l-3 border-transparent text-white/70 hover:bg-white/5 hover:text-white"}`}>
             <Landmark size={18} className={isCollapsed ? "mx-auto" : "mr-3"} />
             {!isCollapsed && <span>All Accounts</span>}
           </Link>
@@ -183,7 +176,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                         key={acc.id} 
                         className={`group flex justify-between items-center px-5 py-2 text-sm transition-all ${
                           pathname === `/accounts/${acc.id}` 
-                            ? 'bg-white dark:bg-slate-900/10 text-white' 
+                            ? 'bg-white/10 text-white' 
                             : 'text-white/60 hover:bg-white/5 hover:text-white/90'
                         }`}
                       >
@@ -239,7 +232,7 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                           key={acc.id} 
                           className={`group flex justify-between items-center px-5 py-2 text-sm transition-all ${
                             pathname === `/accounts/${acc.id}` 
-                              ? 'bg-white dark:bg-slate-900/10 text-white' 
+                              ? 'bg-white/10 text-white' 
                               : 'text-white/60 hover:bg-white/5 hover:text-white/90'
                           }`}
                         >
@@ -325,21 +318,10 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
               Add Account
             </button>
 
-            {/* Theme Toggle Button */}
-            {mounted && (
-              <button 
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="mt-1 mx-4 py-2 px-3 text-sm font-medium text-white/40 hover:text-white hover:bg-white/10 rounded-lg text-left transition-all flex items-center gap-2"
-              >
-                {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-              </button>
-            )}
-
             {/* Logout Button */}
             <button 
               onClick={() => signOut({ callbackUrl: '/login' })}
-              className="mt-1 mx-4 py-2 px-3 text-sm font-medium text-white/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg text-left transition-all flex items-center gap-2 mb-2"
+              className="mt-3 mx-4 py-2 px-3 text-sm font-medium text-white/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg text-left transition-all flex items-center gap-2"
             >
               <LogOut size={14} />
               Log Out

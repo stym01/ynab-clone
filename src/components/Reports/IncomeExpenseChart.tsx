@@ -27,19 +27,19 @@ export default function IncomeExpenseChart({ data }: IncomeExpenseChartProps) {
   const totalExpense = data.reduce((sum, item) => sum + (item.expense || 0), 0)
 
   return (
-    <div className="w-full h-[400px] bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm mt-6">
+    <div className="w-full h-[400px] bg-white p-6 rounded-xl border border-slate-200 shadow-sm mt-6">
       <div className="mb-6 flex justify-between items-end">
         <div>
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">Income v Expense</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Compare your total cash inflow versus outflow.</p>
+          <h2 className="text-xl font-bold text-slate-800">Income v Expense</h2>
+          <p className="text-sm text-slate-500 mt-1">Compare your total cash inflow versus outflow.</p>
         </div>
         <div className="flex gap-8 text-right">
           <div>
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Income</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Total Income</div>
             <div className="text-xl font-bold text-[#23B573]">{formatValue(totalIncome)}</div>
           </div>
           <div>
-            <div className="text-sm font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wider">Total Expense</div>
+            <div className="text-sm font-semibold text-slate-500 uppercase tracking-wider">Total Expense</div>
             <div className="text-xl font-bold text-red-500">{formatValue(totalExpense)}</div>
           </div>
         </div>
