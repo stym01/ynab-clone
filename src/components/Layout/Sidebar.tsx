@@ -3,12 +3,13 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { signOut } from "next-auth/react"
 import AddAccountModal from "../Accounts/AddAccountModal"
 import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronDown, ChevronsLeft, ChevronsRight, PieChart, 
   Landmark, Wallet, CreditCard, PiggyBank, Plus, 
-  MoreHorizontal, Archive, Settings
+  MoreHorizontal, Archive, Settings, LogOut
 } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
 
@@ -287,6 +288,15 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
             >
               <Plus size={14} />
               Add Account
+            </button>
+
+            {/* Logout Button */}
+            <button 
+              onClick={() => signOut({ callbackUrl: '/login' })}
+              className="mt-3 mx-4 py-2 px-3 text-sm font-medium text-white/40 hover:text-red-400 hover:bg-red-400/10 rounded-lg text-left transition-all flex items-center gap-2"
+            >
+              <LogOut size={14} />
+              Log Out
             </button>
 
             {/* Footer with total */}
