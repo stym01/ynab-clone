@@ -167,10 +167,10 @@ export async function syncICICIEmails(accountId: string) {
   }
 
   // Update historyId
-  if (res.data.historyId) {
+  if ((res.data as any).historyId) {
     await (prisma as any).financialAccount.update({
       where: { id: accountId },
-      data: { historyId: res.data.historyId.toString() }
+      data: { historyId: (res.data as any).historyId.toString() }
     });
   }
 
