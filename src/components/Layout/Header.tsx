@@ -104,10 +104,10 @@ export default function Header({
       <div className="flex items-center gap-4 relative flex-1" ref={monthDropdownRef}>
         <button 
           onClick={handlePrevMonth} 
-          className="p-1 rounded-full text-[#5155C3] border-[2px] border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
+          className="p-1 text-[#5155C3] hover:bg-slate-50 rounded transition-all active:scale-95"
           aria-label="Previous month"
         >
-          <ChevronLeft size={22} strokeWidth={2.5} />
+          <ChevronLeft size={20} strokeWidth={2.5} />
         </button>
         
         <div 
@@ -115,20 +115,20 @@ export default function Header({
           onClick={() => setShowMonthDropdown(!showMonthDropdown)}
         >
           <div className="flex items-center gap-1">
-            <h1 className="text-[26px] font-bold text-slate-800 text-center select-none tracking-tight">
+            <h1 className="text-[22px] font-bold text-slate-800 text-center select-none tracking-tight">
               {readableMonth}
             </h1>
-            <ChevronDown size={16} strokeWidth={3} className="text-[#5155C3] mt-1" />
+            <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-1" />
           </div>
           <span className="text-[13px] text-slate-500 font-medium pl-1">Enter a note...</span>
         </div>
 
         <button 
           onClick={handleNextMonth} 
-          className="p-1 rounded-full text-[#5155C3] border-[2px] border-[#5155C3] hover:bg-slate-50 transition-all active:scale-95"
+          className="p-1 text-[#5155C3] hover:bg-slate-50 rounded transition-all active:scale-95"
           aria-label="Next month"
         >
-          <ChevronRight size={22} strokeWidth={2.5} />
+          <ChevronRight size={20} strokeWidth={2.5} />
         </button>
 
         {/* Month Dropdown Popover */}
@@ -187,31 +187,29 @@ export default function Header({
 
       {/* Center: Ready To Assign Pill (Clickable → Breakdown) */}
       <div ref={rtaRef} className="relative flex justify-center flex-1">
-        <div className={`
-          flex items-center justify-between pl-5 pr-2 py-2 rounded-[14px]
-          transition-all min-w-[280px] h-[65px]
-          ${rtaPositive 
-            ? 'bg-[#BAF45A] shadow-sm' 
-            : 'bg-[#E54545] shadow-sm'
-          }
-        `}>
-          <div className="flex flex-col items-start pr-12 cursor-pointer" onClick={() => setShowRTABreakdown(!showRTABreakdown)}>
-            <div className={`text-[22px] font-bold tracking-tight leading-none mb-1 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
+        
+        {/* Right: Ready to Assign (Smaller) */}
+        <div 
+          className={`relative px-4 py-2 rounded-[10px] shadow-sm flex items-center justify-between gap-4 transition-colors min-w-[220px] cursor-pointer
+          ${rtaPositive ? 'bg-[#ACF455] text-slate-800' : 'bg-[#E54545] text-white'}`}
+          onClick={() => setShowRTABreakdown(!showRTABreakdown)}
+        >
+          <div className="flex flex-col">
+            <span className="font-bold text-xl tracking-tight leading-tight">
               {formatCurrency(readyToAssign)}
-            </div>
-            <div className={`text-[13px] font-semibold opacity-90 ${rtaPositive ? 'text-[#1A3104]' : 'text-white'}`}>
+            </span>
+            <span className={`text-[11px] font-medium leading-tight ${rtaPositive ? 'text-slate-700' : 'text-red-100'}`}>
               Ready to Assign
-            </div>
+            </span>
           </div>
-          <div ref={autoRef} className="relative h-full flex items-center">
+          
+          <div ref={autoRef} className="relative">
             <button 
               onClick={(e) => { e.stopPropagation(); setShowAutoAssign(!showAutoAssign); }}
-              className={`
-                flex items-center justify-center gap-2 px-5 h-[42px] rounded-[10px] font-bold text-[15px] transition-colors shadow-sm
-                ${rtaPositive ? 'bg-[#508B1C] hover:bg-[#3D6B15] text-white' : 'bg-red-700 hover:bg-red-800 text-white'}
-              `}
+              className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all
+              ${rtaPositive ? 'bg-[#50821E] text-white hover:bg-[#436C18]' : 'bg-white/20 text-white hover:bg-white/30'}`}
             >
-              Assign <ChevronDown size={14} className={`transition-transform ml-1 ${showAutoAssign ? 'rotate-180' : ''}`} />
+              Assign <ChevronDown size={14} strokeWidth={2.5} />
             </button>
             <AnimatePresence>
               {showAutoAssign && (

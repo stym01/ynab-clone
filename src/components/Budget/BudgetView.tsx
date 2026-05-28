@@ -6,6 +6,7 @@ import MoveMoneyModal from "./MoveMoneyModal"
 import Inspector from "./Inspector"
 import Header from "@/components/Layout/Header"
 import { Filter, PlusCircle, Undo2, Redo2, History, List, AlignJustify } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { updateCategoryAssigned, updateCategoryTarget, moveMoney } from "@/app/actions/budget"
 
 interface BudgetViewProps {
@@ -25,6 +26,7 @@ export default function BudgetView({
   totalAssigned = 0,
   totalOverspending = 0
 }: BudgetViewProps) {
+  const router = useRouter()
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
   const [checkedCategoryIds, setCheckedCategoryIds] = useState<string[]>([])
   const [groups, setGroups] = useState(initialData?.categoryGroups || [])
@@ -270,6 +272,7 @@ export default function BudgetView({
       if (budgetId) {
         const savedGroup = await createCategoryGroup(budgetId, name)
         setGroups(prev => [...prev, { ...savedGroup, categories: [], isExpanded: true }])
+        router.refresh()
       }
     }
   }

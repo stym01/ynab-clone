@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronRight, ChevronDown, Zap, Plus, MoreHorizontal, Check, Minus } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/currency"
 import { addCategory, renameCategory, deleteCategory, renameCategoryGroup, deleteCategoryGroup } from "@/app/actions/budget"
 
@@ -25,6 +26,7 @@ export default function BudgetTable({
   groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney, showProgressBars,
   checkedCategoryIds, onCheckCategory, onCheckGroup, onCheckAll
 }: BudgetTableProps) {
+  const router = useRouter()
   
   const [editValue, setEditValue] = useState<string>("")
   const [coverOverspendingId, setCoverOverspendingId] = useState<string | null>(null)
@@ -143,7 +145,9 @@ export default function BudgetTable({
         }
         return g
       }))
+      router.refresh()
     } catch (error) {
+      console.error("Failed to add category:", error)
       setGroups(prev => prev.map(g => {
         if (g.id === groupId) {
           return { ...g, categories: g.categories.filter((c: any) => c.id !== tempId) }
