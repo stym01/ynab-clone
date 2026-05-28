@@ -190,7 +190,7 @@ export default function BudgetTable({
                 <React.Fragment key={group.id}>
                   {/* Group Header Row */}
                   <tr 
-                    className={`cursor-pointer transition-all border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#E5E7FF]' : 'bg-gradient-to-r from-slate-50 to-white hover:from-slate-100 hover:to-slate-50'}`}
+                    className={`cursor-pointer transition-all border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#F8F7F3] hover:bg-[#F2EFE8]'}`}
                     onClick={() => { toggleGroup(group.id); onSelectCategory(group.id); }}
                     onContextMenu={(e) => handleContextMenu(e, 'group', group.id)}
                   >
@@ -258,12 +258,10 @@ export default function BudgetTable({
                           exit={{ opacity: 0, height: 0 }}
                           transition={{ duration: 0.12 }}
                           key={category.id} 
-                          className={`cursor-pointer transition-all border-b border-slate-50 group/cat ${
+                          className={`cursor-pointer transition-all border-b border-slate-100 group/cat ${
                             isSelected 
-                              ? "bg-[#E5E7FF] border-l-2 border-l-[#005A87]" 
-                              : catIndex % 2 === 1 
-                                ? "bg-slate-50/30 hover:bg-blue-50/30 border-l-2 border-l-transparent" 
-                                : "hover:bg-blue-50/30 border-l-2 border-l-transparent"
+                              ? "bg-[#EEF2FC]" 
+                              : "bg-white hover:bg-slate-50"
                           }`}
                           onClick={() => onSelectCategory(category.id)}
                           onContextMenu={(e) => handleContextMenu(e, 'category', category.id)}
