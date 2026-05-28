@@ -260,14 +260,17 @@ export default function BudgetView({
 
   const handleAddCategoryGroup = async () => {
     if (newCategoryGroupName.trim()) {
+      const name = newCategoryGroupName.trim()
+      setIsAddingCategoryGroup(false)
+      setNewCategoryGroupName("")
+      
       const { createCategoryGroup } = await import("@/app/actions/budget")
       const budgetId = initialData?.id
       if (budgetId) {
-        await createCategoryGroup(budgetId, newCategoryGroupName.trim())
+        const savedGroup = await createCategoryGroup(budgetId, name)
+        setGroups(prev => [...prev, { ...savedGroup, categories: [], isExpanded: true }])
       }
     }
-    setIsAddingCategoryGroup(false)
-    setNewCategoryGroupName("")
   }
 
   return (

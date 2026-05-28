@@ -102,9 +102,50 @@ export default function BudgetTable({
 
   const handleAddCategory = async (groupId: string) => {
     if (!newCategoryName.trim()) return
-    await addCategory(groupId, newCategoryName.trim())
+    const name = newCategoryName.trim()
     setNewCategoryName("")
     setAddingCategoryGroupId(null)
+    
+    const tempId = `temp-${Date.now()}`
+    const newCat = {
+      id: tempId,
+      groupId,
+      name,
+      assigned: 0,
+      activity: 0,
+      available: 0,
+      target: 0,
+      targetType: null,
+      isHidden: false,
+      sortOrder: 999
+    }
+    
+    setGroups(prev => prev.map(g => {
+      if (g.id === groupId) {
+        return { ...g, categories: [...g.categories, newCat] }
+      }
+      return g
+    }))
+    
+    try {
+      const savedCategory = await addCategory(groupId, name)
+      setGroups(prev => prev.map(g => {
+        if (g.id === groupId) {
+          return {
+            ...g,
+            categories: g.categories.map((c: any) => c.id === tempId ? { ...savedCategory, assigned: 0, activity: 0, available: 0 } : c)
+          }
+        }
+        return g
+      }))
+    } catch (error) {
+      setGroups(prev => prev.map(g => {
+        if (g.id === groupId) {
+          return { ...g, categories: g.categories.filter((c: any) => c.id !== tempId) }
+        }
+        return g
+      }))
+    }
   }
 
   const handleInlineEditSubmit = async () => {
