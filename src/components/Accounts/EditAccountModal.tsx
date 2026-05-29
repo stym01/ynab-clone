@@ -93,19 +93,41 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-slate-600 flex items-center justify-between">
               Bank Connection
-              {syncProvider === "ICICI_GMAIL" && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">LINKED</span>}
+              {(syncProvider.startsWith("ICICI") || syncProvider.startsWith("KOTAK")) && <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">LINKED</span>}
             </label>
             <p className="text-xs text-slate-500 mb-1">
-              Link your account to your financial institution and import transactions directly from Gmail without ever leaving the app.
+              Link your account to your financial institution and import transactions.
             </p>
             <select 
-              value={syncProvider} 
-              onChange={e => setSyncProvider(e.target.value)}
+              value={syncProvider.startsWith("KOTAK_SMS_") ? "KOTAK_SMS" : syncProvider} 
+              onChange={e => {
+                if (e.target.value === "KOTAK_SMS") {
+                  setSyncProvider("KOTAK_SMS_")
+                } else {
+                  setSyncProvider(e.target.value)
+                }
+              }}
               className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white"
             >
               <option value="none">Unlinked (Manual entry only)</option>
               <option value="ICICI_GMAIL">ICICI Credit Card (Gmail Sync)</option>
+              <option value="KOTAK_SMS">Kotak Mahindra Bank (SMS Sync)</option>
             </select>
+            
+            {syncProvider.startsWith("KOTAK_SMS") && (
+              <div className="mt-2 flex flex-col gap-1.5 p-3 bg-slate-50 rounded-md border border-slate-200">
+                <label className="text-xs font-semibold text-slate-600">Account Tail (Last 4 Digits)</label>
+                <input 
+                  required
+                  type="text" 
+                  placeholder="e.g. 6065"
+                  value={syncProvider.replace("KOTAK_SMS_", "")}
+                  onChange={e => setSyncProvider(`KOTAK_SMS_${e.target.value}`)}
+                  className="px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent transition-shadow"
+                />
+                <p className="text-[10px] text-slate-500">Configure your Android webhook to point to <code className="bg-slate-200 px-1 rounded">/api/webhooks/sms?secret=YOUR_SECRET</code></p>
+              </div>
+            )}
           </div>
           
           <div className="flex justify-between items-center mt-2 pt-4 border-t border-slate-100">

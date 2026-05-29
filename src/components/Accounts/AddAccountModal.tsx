@@ -20,7 +20,17 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
     setIsSubmitting(true)
     try {
       const balanceCents = Math.round(parseFloat(balance || "0") * 100)
-      await createAccount(name, type, balanceCents)
+      
+      let actualType = type
+      let syncProvider: string | undefined = undefined
+      
+      if (type.startsWith("kotak_sms_")) {
+        actualType = "checking" // Default to checking for Kotak, or could be savings
+        const tail = type.replace("kotak_sms_", "")
+        syncProvider = `KOTAK_SMS_${tail}`
+      }
+      
+      await createAccount(name, actualType, balanceCents, syncProvider)
       onClose()
     } catch (err) {
       console.error(err)
@@ -64,17 +74,38 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
           </div>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-semibold text-slate-600">Account Type</label>
+            <label className="text-sm font-semibold text-slate-600">Account Type / Sync</label>
             <select 
-              value={type} 
-              onChange={e => setType(e.target.value)}
+              value={type.startsWith("kotak_sms") ? "kotak_sms" : type} 
+              onChange={e => {
+                if (e.target.value === "kotak_sms") {
+                  setType("kotak_sms_")
+                } else {
+                  setType(e.target.value)
+                }
+              }}
               className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white"
             >
-              <option value="checking">Checking</option>
-              <option value="savings">Savings</option>
-              <option value="creditCard">Credit Card</option>
-              <option value="icici_credit">ICICI Credit Card (Auto-Sync)</option>
+              <option value="checking">Checking (Manual)</option>
+              <option value="savings">Savings (Manual)</option>
+              <option value="creditCard">Credit Card (Manual)</option>
+              <option value="icici_credit">ICICI Credit Card (Gmail Auto-Sync)</option>
+              <option value="kotak_sms">Kotak Mahindra Bank (SMS Auto-Sync)</option>
             </select>
+            
+            {type.startsWith("kotak_sms") && (
+              <div className="mt-2 flex flex-col gap-1.5 p-3 bg-slate-50 rounded-md border border-slate-200">
+                <label className="text-xs font-semibold text-slate-600">Account Tail (Last 4 Digits)</label>
+                <input 
+                  required
+                  type="text" 
+                  placeholder="e.g. 6065"
+                  value={type.replace("kotak_sms_", "")}
+                  onChange={e => setType(`kotak_sms_${e.target.value}`)}
+                  className="px-3 py-1.5 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent transition-shadow"
+                />
+              </div>
+            )}
           </div>
           
           <div className="flex flex-col gap-1.5">

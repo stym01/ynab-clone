@@ -6,13 +6,15 @@ import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
 import { enableGmailWatch } from "./bankSync"
 
-export async function createAccount(name: string, type: string, startingBalanceCents: number) {
+export async function createAccount(name: string, type: string, startingBalanceCents: number, syncProvider?: string) {
   const user = await requireUser()
   const budget = await prisma.budget.findFirst({ where: { userId: user.id } })
   if (!budget) throw new Error("No budget found")
 
   const isICICI = type === "icici_credit"
   const actualType = isICICI ? "creditCard" : type
+  
+  const finalSyncProvider = syncProvider || (isICICI ? "ICICI_GMAIL" : null)
 
   // Create account
   const account = await prisma.financialAccount.create({
@@ -21,7 +23,7 @@ export async function createAccount(name: string, type: string, startingBalanceC
       name,
       type: actualType,
       balance: startingBalanceCents,
-      syncProvider: isICICI ? "ICICI_GMAIL" : null
+      syncProvider: finalSyncProvider
     }
   })
 
