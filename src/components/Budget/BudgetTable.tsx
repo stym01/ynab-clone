@@ -487,25 +487,35 @@ export default function BudgetTable({
                                               {isChecked && <Check size={10} className="text-white" strokeWidth={3} />}
                                             </div>
                                             <span className="font-medium text-slate-700 flex items-center gap-1.5 text-[13px]">
-                                            {inlineEditing?.id === category.id && inlineEditing?.type === 'category' ? (
-                                              <input
-                                                autoFocus
-                                                type="text"
-                                                value={inlineEditing.name}
-                                                onChange={(e) => setInlineEditing({ ...inlineEditing, name: e.target.value })}
-                                                onKeyDown={(e) => {
-                                                  if (e.key === 'Enter') handleInlineEditSubmit()
-                                                  if (e.key === 'Escape') setInlineEditing(null)
-                                                }}
-                                                onBlur={handleInlineEditSubmit}
-                                                className="bg-white border border-[#005A87] rounded px-1 outline-none w-32"
-                                                onClick={(e) => e.stopPropagation()}
-                                              />
-                                            ) : (
-                                              category.name
-                                            )}
-                                            {category.target > 0 && <Zap size={11} className="text-[#E8A317]" />}
-                                          </span>
+                                              {inlineEditing?.id === category.id && inlineEditing?.type === 'category' ? (
+                                                <input
+                                                  autoFocus
+                                                  type="text"
+                                                  value={inlineEditing.name}
+                                                  onChange={(e) => setInlineEditing({ ...inlineEditing, name: e.target.value })}
+                                                  onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') handleInlineEditSubmit()
+                                                    if (e.key === 'Escape') setInlineEditing(null)
+                                                  }}
+                                                  onBlur={handleInlineEditSubmit}
+                                                  className="bg-white border border-[#005A87] rounded px-1 outline-none w-32"
+                                                  onClick={(e) => e.stopPropagation()}
+                                                />
+                                              ) : (
+                                                <div className="flex items-center gap-2">
+                                                  <span>{category.name}</span>
+                                                  {category.target > 0 && (() => {
+                                                    const effectiveTarget = category.monthlyTargetAmount || category.target || 0
+                                                    const under = Math.max(0, effectiveTarget - category.available)
+                                                    if (under > 0) {
+                                                      return <span className="text-[11px] text-slate-400 font-normal">{formatCurrency(under)} more needed this month</span>
+                                                    }
+                                                    return null
+                                                  })()}
+                                                </div>
+                                              )}
+                                              {category.target > 0 && <Zap size={11} className="text-[#E8A317]" />}
+                                            </span>
                                           </div>
                                           {category.target > 0 && (
                                             <div className="w-20 h-1 bg-slate-200 rounded-full overflow-hidden">

@@ -100,6 +100,32 @@ export async function getBudgetData(month: string) {
         .filter(t => t.categoryId === category.id && t.date.toISOString().startsWith(prevMonthStr) && t.amount < 0)
         .reduce((sum, t) => sum + t.amount, 0))
 
+      // NEW LOGIC: Calculate Monthly Target Amount for Advanced Targets
+      let monthlyTargetAmount = category.target
+      
+      if (category.target > 0) {
+        if (category.targetCadence === 'YEARLY' || category.targetCadence === 'BY_DATE') {
+          if (category.targetDate) {
+            const targetDate = new Date(category.targetDate)
+            const currentMonthDate = new Date(parseInt(y), parseInt(m) - 1, 1)
+            
+            // Calculate months difference
+            let monthsLeft = (targetDate.getFullYear() - currentMonthDate.getFullYear()) * 12 
+                           + (targetDate.getMonth() - currentMonthDate.getMonth())
+                           
+            // If the target is in the past or this month, monthsLeft should be at least 1
+            if (monthsLeft < 1) monthsLeft = 1
+            
+            // Remaining needed is Total Target - What we had available at the START of the month
+            const remainingToFund = Math.max(0, category.target - rollover)
+            
+            // The monthly goal is the remaining amount divided by months left
+            // E.g. $645 target, $0 rollover, 11 months left -> 645/11 = 58.636 => 5864 cents
+            monthlyTargetAmount = Math.ceil(remainingToFund / monthsLeft)
+          }
+        }
+      }
+
       return {
         id: category.id,
         name: category.name,
@@ -110,6 +136,9 @@ export async function getBudgetData(month: string) {
         spentLastMonth,
         targetType: category.targetType,
         target: category.target,
+        targetCadence: category.targetCadence,
+        targetDate: category.targetDate,
+        monthlyTargetAmount: monthlyTargetAmount,
       }
     })
 
@@ -163,14 +192,16 @@ export async function updateCategoryAssigned(categoryId: string, month: string, 
   revalidatePath("/budget")
 }
 
-export async function updateCategoryTarget(categoryId: string, targetType: string, target: number) {
+export async function updateCategoryTarget(categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null) {
   const user = await requireUser()
 
   await prisma.category.update({
     where: { id: categoryId },
     data: {
       targetType,
-      target
+      target,
+      targetCadence: targetCadence || null,
+      targetDate: targetDate || null,
     }
   })
 

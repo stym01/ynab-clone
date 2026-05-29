@@ -8,7 +8,7 @@ import { formatCurrency, CURRENCY_SYMBOL } from "@/lib/currency"
 interface InspectorProps {
   categoryData: any
   onUpdateAssigned: (categoryId: string, amount: number) => Promise<void>
-  onUpdateTarget: (categoryId: string, targetType: string, target: number) => Promise<void>
+  onUpdateTarget: (categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null) => Promise<void>
   groups?: any[]
   month?: string
 }
@@ -17,6 +17,8 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
   const [isEditingTarget, setIsEditingTarget] = useState(false)
   const [editTargetType, setEditTargetType] = useState("NEEDED_FOR_SPENDING")
   const [editTargetAmount, setEditTargetAmount] = useState("")
+  const [editTargetCadence, setEditTargetCadence] = useState("MONTHLY")
+  const [editTargetDate, setEditTargetDate] = useState("")
 
   const [isAvailableBalanceOpen, setIsAvailableBalanceOpen] = useState(false)
   const [isTargetOpen, setIsTargetOpen] = useState(false)
@@ -26,9 +28,7 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
     const totalBudgeted = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.assigned, 0), 0)
     const totalActivity = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.activity, 0), 0)
     const totalAvailable = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.available, 0), 0)
-    const totalUnderfunded = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + Math.max(0, (c.target || 0) - c.available), 0), 0)
-
-    const totalTargets = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + (c.target || 0), 0), 0)
+    const totalTargets = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + (c.monthlyTargetAmount || c.target || 0), 0), 0)
 
     const dateObj = new Date((month || "2026-05") + "-01T00:00:00")
     const readableMonth = dateObj.toLocaleDateString('en-US', { month: 'long' })
@@ -74,9 +74,9 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
     )
   }
 
-  // Calculate underfunded amount
-  const underfunded = Math.max(0, (categoryData.target || 0) - categoryData.available)
-  const targetProgress = categoryData.target > 0 ? Math.min(100, (categoryData.available / categoryData.target) * 100) : 0
+  const effectiveMonthlyTarget = categoryData.monthlyTargetAmount || categoryData.target || 0
+  const underfunded = Math.max(0, effectiveMonthlyTarget - categoryData.available)
+  const targetProgress = effectiveMonthlyTarget > 0 ? Math.min(100, (categoryData.available / effectiveMonthlyTarget) * 100) : 0
 
   const handleAutoAssignUnderfunded = () => {
     if (underfunded > 0) {
@@ -86,18 +86,25 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
 
   const handleSaveTarget = async () => {
     const amountInPaise = Math.round(parseFloat(editTargetAmount || "0") * 100)
-    await onUpdateTarget(categoryData.id, editTargetType, amountInPaise)
+    let d = editTargetDate ? new Date(editTargetDate) : null
+    await onUpdateTarget(categoryData.id, editTargetType, amountInPaise, editTargetCadence, d)
     setIsEditingTarget(false)
   }
 
   const handleDeleteTarget = async () => {
-    await onUpdateTarget(categoryData.id, "NEEDED_FOR_SPENDING", 0)
+    await onUpdateTarget(categoryData.id, "NEEDED_FOR_SPENDING", 0, null, null)
     setIsEditingTarget(false)
   }
 
   const openTargetEditor = () => {
     setEditTargetType(categoryData.targetType || "NEEDED_FOR_SPENDING")
     setEditTargetAmount(categoryData.target ? (categoryData.target / 100).toFixed(2) : "")
+    setEditTargetCadence(categoryData.targetCadence || "MONTHLY")
+    if (categoryData.targetDate) {
+      setEditTargetDate(new Date(categoryData.targetDate).toISOString().split('T')[0])
+    } else {
+      setEditTargetDate("")
+    }
     setIsEditingTarget(true)
   }
 
@@ -170,23 +177,63 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
                   <button onClick={openTargetEditor} className="text-sm font-medium text-[#005a70] hover:underline">Edit</button>
                 </div>
                 
-                <div className="text-xl font-bold text-slate-800">
-                  {formatCurrency(categoryData.target)} 
-                </div>
-                
-                {/* Progress bar */}
-                <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mt-1">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${targetProgress}%` }}
-                    transition={{ duration: 0.5, ease: "easeOut" }}
-                    className={`h-full rounded-full ${targetProgress >= 100 ? 'bg-[#23B573]' : 'bg-[#E8A317]'}`}
-                  />
-                </div>
-                
-                <div className={`text-[13px] font-semibold ${underfunded > 0 ? 'text-[#E8A317]' : 'text-[#23B573]'}`}>
-                  {underfunded > 0 ? `${formatCurrency(underfunded)} to go` : 'Fully Funded!'}
-                </div>
+                {categoryData.targetCadence === 'YEARLY' || categoryData.targetCadence === 'BY_DATE' ? (
+                  <div className="flex flex-col mb-2">
+                    <div className="text-[13px] font-medium text-slate-500 mb-2 border-b border-slate-100 pb-2">
+                      Set Aside {formatCurrency(categoryData.target)} {categoryData.targetCadence === 'YEARLY' ? 'Each Year' : ''}
+                      {categoryData.targetDate && <div>By {new Date(categoryData.targetDate).toLocaleDateString()}</div>}
+                    </div>
+                    <div className="flex justify-center my-4 relative">
+                      <svg className="w-24 h-24 transform -rotate-90">
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-slate-100" />
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" 
+                          strokeDasharray={251.2} 
+                          strokeDashoffset={251.2 - (251.2 * targetProgress / 100)} 
+                          className={targetProgress >= 100 ? 'text-[#23B573]' : 'text-[#E8A317]'} 
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center font-bold text-slate-700 text-lg">
+                        {Math.round(targetProgress)}%
+                      </div>
+                    </div>
+                    
+                    {underfunded > 0 ? (
+                       <div className="bg-[#FFF8E6] text-[#A67500] px-3 py-2 rounded-lg text-[13px] text-center font-bold mb-2 shadow-sm border border-[#FFE8B3]">
+                         Assign {formatCurrency(underfunded)} this month to stay on track
+                       </div>
+                    ) : (
+                       <div className="bg-[#E6F7EF] text-[#1A7346] px-3 py-2 rounded-lg text-[13px] text-center font-bold mb-2 shadow-sm border border-[#B3E5CA]">
+                         Funded! You are on track this month.
+                       </div>
+                    )}
+                    
+                    <div className="flex justify-between text-[13px] text-slate-500 mt-2">
+                      <span>Total to Assign</span>
+                      <span className="font-semibold text-slate-700">{formatCurrency(categoryData.target)}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="text-xl font-bold text-slate-800">
+                      {formatCurrency(effectiveMonthlyTarget)} 
+                    </div>
+                    
+                    {/* Standard Progress bar for Monthly */}
+                    <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden mt-1">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${targetProgress}%` }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                        className={`h-full rounded-full ${targetProgress >= 100 ? 'bg-[#23B573]' : 'bg-[#E8A317]'}`}
+                      />
+                    </div>
+                    
+                    <div className={`text-[13px] font-semibold ${underfunded > 0 ? 'text-[#E8A317]' : 'text-[#23B573]'}`}>
+                      {underfunded > 0 ? `${formatCurrency(underfunded)} to go` : 'Fully Funded!'}
+                    </div>
+                  </>
+                )}
                 
                 <div className="pt-3 mt-1 border-t border-slate-100 flex justify-center">
                   <button className="text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors">
@@ -203,15 +250,27 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
 
   const renderTargetEditor = () => {
     return (
-      <div className="flex flex-col gap-4 p-4 bg-white border border-blue-200 rounded-lg shadow-md ring-1 ring-blue-100">
+      <div className="flex flex-col gap-4 p-4 bg-white border border-[#3B42A4] rounded-lg shadow-md ring-1 ring-[#EEF2FC]">
         <h4 className="font-bold text-slate-800 text-sm">Target Settings</h4>
         
-        <div className="flex flex-col gap-1.5">
+        <div className="flex bg-slate-100 p-1 rounded-lg">
+          {["WEEKLY", "MONTHLY", "YEARLY", "BY_DATE"].map(cadence => (
+            <button
+              key={cadence}
+              onClick={() => setEditTargetCadence(cadence)}
+              className={`flex-1 text-[11px] uppercase tracking-wide font-bold py-1.5 rounded-md transition-all ${editTargetCadence === cadence ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+            >
+              {cadence === "BY_DATE" ? "Custom" : cadence}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-1.5 mt-1">
           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Target Type</label>
           <select 
             value={editTargetType}
             onChange={(e) => setEditTargetType(e.target.value)}
-            className="w-full border border-slate-300 rounded p-2 text-sm text-slate-700 outline-none focus:border-blue-400"
+            className="w-full border border-slate-300 rounded p-2 text-sm text-slate-700 outline-none focus:border-[#3B42A4]"
           >
             <option value="NEEDED_FOR_SPENDING">Needed For Spending</option>
             <option value="SAVINGS_BUILDER">Savings Builder</option>
@@ -227,11 +286,23 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
               step="0.01"
               value={editTargetAmount}
               onChange={(e) => setEditTargetAmount(e.target.value)}
-              className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded text-sm text-slate-700 outline-none focus:border-blue-400" 
+              className="w-full pl-7 pr-3 py-2 border border-slate-300 rounded text-sm text-slate-700 outline-none focus:border-[#3B42A4]" 
               placeholder="0.00"
             />
           </div>
         </div>
+
+        {(editTargetCadence === 'YEARLY' || editTargetCadence === 'BY_DATE') && (
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">By Date</label>
+            <input 
+              type="date"
+              value={editTargetDate}
+              onChange={(e) => setEditTargetDate(e.target.value)}
+              className="w-full p-2 border border-slate-300 rounded text-sm text-slate-700 outline-none focus:border-[#3B42A4]"
+            />
+          </div>
+        )}
 
         <div className="flex justify-between items-center mt-2 pt-3 border-t border-slate-100">
           <button 
@@ -249,7 +320,7 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
             </button>
             <button 
               onClick={handleSaveTarget}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-[#005a70] rounded hover:bg-[#004252] transition-colors"
+              className="px-3 py-1.5 text-sm font-medium text-white bg-[#3B42A4] rounded hover:bg-[#2B3180] transition-colors"
             >
               Save Target
             </button>
@@ -345,6 +416,15 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
                   className="overflow-hidden"
                 >
                   <div className="flex flex-col p-2 text-sm">
+                    {underfunded > 0 && (
+                      <button 
+                        onClick={handleAutoAssignUnderfunded}
+                        className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors"
+                      >
+                        <span>Underfunded</span>
+                        <span>{formatCurrency(underfunded)}</span>
+                      </button>
+                    )}
                     <button 
                       onClick={() => onUpdateAssigned(categoryData.id, categoryData.assigned + (categoryData.assignedLastMonth || 0))}
                       className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors"
