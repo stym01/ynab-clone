@@ -189,19 +189,19 @@ export default function BudgetView({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [past, future])
 
-  const handleUpdateTarget = async (categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null) => {
+  const handleUpdateTarget = async (categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null, targetRepeatEvery?: number | null, targetRepeatCadence?: string | null) => {
     // Optimistic Update
     setGroups((prevGroups: any[]) => prevGroups.map((g: any) => ({
       ...g,
       categories: g.categories.map((c: any) =>
         c.id === categoryId
-          ? { ...c, targetType, target, targetCadence, targetDate }
+          ? { ...c, targetType, target, targetCadence, targetDate, targetRepeatEvery, targetRepeatCadence }
           : c
       )
     })))
 
     // Server Update
-    await updateCategoryTarget(categoryId, targetType, target, targetCadence, targetDate)
+    await updateCategoryTarget(categoryId, targetType, target, targetCadence, targetDate, targetRepeatEvery, targetRepeatCadence)
   }
 
   const handleAutoAssignUnderfunded = () => {

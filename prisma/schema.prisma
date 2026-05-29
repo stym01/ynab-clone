@@ -121,6 +121,8 @@ model Category {
   targetDay     Int?     // Day of week (1-7) or day of month (1-31)
   targetMonth   Int?     // Month (1-12) for YEARLY
   targetDate    DateTime? // Specific date for BY_DATE
+  targetRepeatEvery   Int?     // e.g., 1, 2
+  targetRepeatCadence String?  // "MONTHS" | "YEARS"
   sortOrder   Int      @default(0)
   isHidden    Boolean  @default(false)
 

@@ -103,15 +103,27 @@ export async function getBudgetData(month: string) {
       // NEW LOGIC: Calculate Monthly Target Amount for Advanced Targets
       let monthlyTargetAmount = category.target
       
+      let effectiveTargetDate = category.targetDate ? new Date(category.targetDate) : null
+      
       if (category.target > 0) {
         if (category.targetCadence === 'YEARLY' || category.targetCadence === 'BY_DATE') {
-          if (category.targetDate) {
-            const targetDate = new Date(category.targetDate)
+          if (effectiveTargetDate) {
             const currentMonthDate = new Date(parseInt(y), parseInt(m) - 1, 1)
             
+            // Advance target date if repeating and in the past
+            if (category.targetRepeatEvery && category.targetRepeatCadence && effectiveTargetDate < currentMonthDate) {
+              while (effectiveTargetDate < currentMonthDate) {
+                if (category.targetRepeatCadence === 'MONTHS') {
+                  effectiveTargetDate.setMonth(effectiveTargetDate.getMonth() + category.targetRepeatEvery)
+                } else if (category.targetRepeatCadence === 'YEARS') {
+                  effectiveTargetDate.setFullYear(effectiveTargetDate.getFullYear() + category.targetRepeatEvery)
+                }
+              }
+            }
+            
             // Calculate months difference
-            let monthsLeft = (targetDate.getFullYear() - currentMonthDate.getFullYear()) * 12 
-                           + (targetDate.getMonth() - currentMonthDate.getMonth())
+            let monthsLeft = (effectiveTargetDate.getFullYear() - currentMonthDate.getFullYear()) * 12 
+                           + (effectiveTargetDate.getMonth() - currentMonthDate.getMonth())
                            
             // If the target is in the past or this month, monthsLeft should be at least 1
             if (monthsLeft < 1) monthsLeft = 1
@@ -120,7 +132,6 @@ export async function getBudgetData(month: string) {
             const remainingToFund = Math.max(0, category.target - rollover)
             
             // The monthly goal is the remaining amount divided by months left
-            // E.g. $645 target, $0 rollover, 11 months left -> 645/11 = 58.636 => 5864 cents
             monthlyTargetAmount = Math.ceil(remainingToFund / monthsLeft)
           }
         }
@@ -137,7 +148,10 @@ export async function getBudgetData(month: string) {
         targetType: category.targetType,
         target: category.target,
         targetCadence: category.targetCadence,
-        targetDate: category.targetDate,
+        targetDate: category.targetDate, // Or return effectiveTargetDate if you want the UI to show the next one! Let's return effectiveTargetDate.
+        effectiveTargetDate: effectiveTargetDate,
+        targetRepeatEvery: category.targetRepeatEvery,
+        targetRepeatCadence: category.targetRepeatCadence,
         monthlyTargetAmount: monthlyTargetAmount,
       }
     })
@@ -192,7 +206,7 @@ export async function updateCategoryAssigned(categoryId: string, month: string, 
   revalidatePath("/budget")
 }
 
-export async function updateCategoryTarget(categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null) {
+export async function updateCategoryTarget(categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null, targetRepeatEvery?: number | null, targetRepeatCadence?: string | null) {
   const user = await requireUser()
 
   await prisma.category.update({
@@ -202,6 +216,8 @@ export async function updateCategoryTarget(categoryId: string, targetType: strin
       target,
       targetCadence: targetCadence || null,
       targetDate: targetDate || null,
+      targetRepeatEvery: targetRepeatEvery || null,
+      targetRepeatCadence: targetRepeatCadence || null,
     }
   })
 

@@ -8,7 +8,7 @@ import { formatCurrency, CURRENCY_SYMBOL } from "@/lib/currency"
 interface InspectorProps {
   categoryData: any
   onUpdateAssigned: (categoryId: string, amount: number) => Promise<void>
-  onUpdateTarget: (categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null) => Promise<void>
+  onUpdateTarget: (categoryId: string, targetType: string, target: number, targetCadence?: string | null, targetDate?: Date | null, targetRepeatEvery?: number | null, targetRepeatCadence?: string | null) => Promise<void>
   groups?: any[]
   month?: string
 }
@@ -19,6 +19,9 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
   const [editTargetAmount, setEditTargetAmount] = useState("")
   const [editTargetCadence, setEditTargetCadence] = useState("MONTHLY")
   const [editTargetDate, setEditTargetDate] = useState("")
+  const [editRepeat, setEditRepeat] = useState(false)
+  const [editRepeatEvery, setEditRepeatEvery] = useState(1)
+  const [editRepeatCadence, setEditRepeatCadence] = useState("MONTHS")
 
   const [isAvailableBalanceOpen, setIsAvailableBalanceOpen] = useState(false)
   const [isTargetOpen, setIsTargetOpen] = useState(false)
@@ -87,12 +90,14 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
   const handleSaveTarget = async () => {
     const amountInPaise = Math.round(parseFloat(editTargetAmount || "0") * 100)
     let d = editTargetDate ? new Date(editTargetDate) : null
-    await onUpdateTarget(categoryData.id, editTargetType, amountInPaise, editTargetCadence, d)
+    const rEvery = editRepeat ? editRepeatEvery : null
+    const rCadence = editRepeat ? editRepeatCadence : null
+    await onUpdateTarget(categoryData.id, editTargetType, amountInPaise, editTargetCadence, d, rEvery, rCadence)
     setIsEditingTarget(false)
   }
 
   const handleDeleteTarget = async () => {
-    await onUpdateTarget(categoryData.id, "NEEDED_FOR_SPENDING", 0, null, null)
+    await onUpdateTarget(categoryData.id, "NEEDED_FOR_SPENDING", 0, null, null, null, null)
     setIsEditingTarget(false)
   }
 
@@ -105,6 +110,9 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
     } else {
       setEditTargetDate("")
     }
+    setEditRepeat(!!categoryData.targetRepeatEvery)
+    setEditRepeatEvery(categoryData.targetRepeatEvery || 1)
+    setEditRepeatCadence(categoryData.targetRepeatCadence || "MONTHS")
     setIsEditingTarget(true)
   }
 
@@ -181,7 +189,8 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
                   <div className="flex flex-col mb-2">
                     <div className="text-[13px] font-medium text-slate-500 mb-2 border-b border-slate-100 pb-2">
                       Set Aside {formatCurrency(categoryData.target)} {categoryData.targetCadence === 'YEARLY' ? 'Each Year' : ''}
-                      {categoryData.targetDate && <div>By {new Date(categoryData.targetDate).toLocaleDateString()}</div>}
+                      {categoryData.effectiveTargetDate && <div>By {new Date(categoryData.effectiveTargetDate).toLocaleDateString()}</div>}
+                      {categoryData.targetRepeatEvery && <div className="mt-1 text-[#3B42A4] font-semibold text-xs">(Repeats every {categoryData.targetRepeatEvery} {categoryData.targetRepeatCadence?.toLowerCase()})</div>}
                     </div>
                     <div className="flex justify-center my-4 relative">
                       <svg className="w-24 h-24 transform -rotate-90">
@@ -293,14 +302,57 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
         </div>
 
         {(editTargetCadence === 'YEARLY' || editTargetCadence === 'BY_DATE') && (
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">By Date</label>
-            <input 
-              type="date"
-              value={editTargetDate}
-              onChange={(e) => setEditTargetDate(e.target.value)}
-              className="w-full p-2 border border-slate-300 rounded text-sm text-slate-700 outline-none focus:border-[#3B42A4]"
-            />
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">By Date</label>
+              <input 
+                type="date"
+                value={editTargetDate}
+                onChange={(e) => setEditTargetDate(e.target.value)}
+                className="w-full p-2 border border-slate-300 rounded text-sm text-slate-700 outline-none focus:border-[#3B42A4]"
+              />
+            </div>
+            
+            {editTargetCadence === 'BY_DATE' && (
+              <>
+                <div className="flex items-center gap-2 mt-1 cursor-pointer w-fit" onClick={() => setEditRepeat(!editRepeat)}>
+                  <button 
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${editRepeat ? 'bg-[#3B42A4]' : 'bg-slate-300'}`}
+                  >
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${editRepeat ? 'translate-x-4' : 'translate-x-1'}`} />
+                  </button>
+                  <span className="text-sm font-medium text-slate-700">Repeat</span>
+                </div>
+                
+                {editRepeat && (
+                  <div className="flex flex-col gap-1.5 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Every</label>
+                    <div className="flex gap-2">
+                      <select 
+                        value={editRepeatEvery}
+                        onChange={(e) => setEditRepeatEvery(parseInt(e.target.value))}
+                        className="w-20 border border-slate-300 rounded p-2 text-sm text-slate-700 outline-none focus:border-[#3B42A4]"
+                      >
+                        {Array.from({ length: editRepeatCadence === 'MONTHS' ? 12 : 20 }, (_, i) => i + 1).map(n => (
+                          <option key={n} value={n}>{n}</option>
+                        ))}
+                      </select>
+                      <select 
+                        value={editRepeatCadence}
+                        onChange={(e) => {
+                          setEditRepeatCadence(e.target.value)
+                          setEditRepeatEvery(1) // Reset to 1 to avoid invalid state like "20 Months" if not intended, or "15 Years" -> valid. But length changes.
+                        }}
+                        className="flex-1 border border-slate-300 rounded p-2 text-sm text-slate-700 outline-none focus:border-[#3B42A4]"
+                      >
+                        <option value="MONTHS">Month(s)</option>
+                        <option value="YEARS">Year(s)</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
