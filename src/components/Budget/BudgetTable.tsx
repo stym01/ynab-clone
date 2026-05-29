@@ -405,7 +405,7 @@ export default function BudgetTable({
                     <React.Fragment key={group.id}>
                       <SortableGroupRow 
                         id={group.id}
-                        className={`cursor-pointer transition-colors border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#F8F7F3] hover:bg-[#F2EFE8]'}`}
+                        className={`cursor-pointer transition-colors border-t border-slate-300 border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#F8F7F3] hover:bg-[#EFECE5]'}`}
                         onClick={() => { toggleGroup(group.id); onSelectCategory(group.id); }}
                         onContextMenu={(e: React.MouseEvent) => handleContextMenu(e, 'group', group.id)}
                       >
@@ -440,11 +440,11 @@ export default function BudgetTable({
                                       if (e.key === 'Escape') setInlineEditing(null)
                                     }}
                                     onBlur={handleInlineEditSubmit}
-                                    className="font-bold text-slate-700 text-[13px] uppercase tracking-wide bg-white border border-[#005A87] rounded px-1 outline-none"
+                                    className="font-bold text-slate-800 text-[15px] bg-white border border-[#005A87] rounded px-1 outline-none"
                                     onClick={(e) => e.stopPropagation()}
                                   />
                                 ) : (
-                                  <span className="font-bold text-slate-700 text-[13px] uppercase tracking-wide">{group.name}</span>
+                                  <span className="font-bold text-slate-800 text-[15px]">{group.name}</span>
                                 )}
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); setAddingCategoryGroupId(group.id); setNewCategoryName(""); }}
@@ -460,13 +460,13 @@ export default function BudgetTable({
                                 </button>
                               </div>
                             </td>
-                            <td className="px-5 py-2.5 font-semibold text-right text-slate-600 text-[13px]">
+                            <td className="px-5 py-2.5 font-bold text-right text-slate-800 text-[14px]">
                               {formatCurrency(groupAssigned)}
                             </td>
-                            <td className="px-5 py-2.5 font-semibold text-right text-slate-600 text-[13px]">
+                            <td className="px-5 py-2.5 font-bold text-right text-slate-800 text-[14px]">
                               {formatCurrency(groupActivity)}
                             </td>
-                            <td className="px-5 py-2.5 font-semibold text-right text-slate-600 text-[13px]">
+                            <td className="px-5 py-2.5 font-bold text-right text-slate-800 text-[14px]">
                               {formatCurrency(groupAvailable)}
                             </td>
                           </>
