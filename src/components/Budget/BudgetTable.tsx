@@ -385,9 +385,9 @@ export default function BudgetTable({
                     CATEGORY
                   </div>
                 </th>
-                <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Assigned</th>
-                <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Activity</th>
-                <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[20%]">Available</th>
+                <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[15%]">Assigned</th>
+                <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[15%]">Activity</th>
+                <th className="px-5 py-2.5 font-semibold text-slate-500 text-[11px] uppercase tracking-wider text-right w-[15%]">Available</th>
               </tr>
             </thead>
             <tbody>
@@ -405,7 +405,7 @@ export default function BudgetTable({
                     <React.Fragment key={group.id}>
                       <SortableGroupRow 
                         id={group.id}
-                        className={`cursor-pointer transition-colors border-t border-slate-300 border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#F8F7F3] hover:bg-[#EFECE5]'}`}
+                        className={`cursor-pointer transition-colors border-t border-[#C0C0C0] border-b border-slate-200 group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#F8F7F3] hover:bg-[#EFECE5]'}`}
                         onClick={() => { toggleGroup(group.id); onSelectCategory(group.id); }}
                         onContextMenu={(e: React.MouseEvent) => handleContextMenu(e, 'group', group.id)}
                       >
@@ -483,7 +483,7 @@ export default function BudgetTable({
                                 <SortableCategoryRow 
                                   id={category.id}
                                   key={category.id} 
-                                  className={`cursor-pointer transition-colors border-b border-slate-100 group/cat ${
+                                  className={`cursor-pointer transition-colors border-b border-slate-200 group/cat ${
                                     isSelected || isChecked
                                       ? "bg-[#EEF2FC]" 
                                       : "bg-white hover:bg-slate-50"
@@ -507,7 +507,7 @@ export default function BudgetTable({
                                             >
                                               {isChecked && <Check size={10} className="text-white" strokeWidth={3} />}
                                             </div>
-                                            <span className="font-medium text-slate-700 flex items-center gap-1.5 text-[13px]">
+                                            <span className="font-medium text-slate-800 flex items-center gap-1.5 text-[14px]">
                                               {inlineEditing?.id === category.id && inlineEditing?.type === 'category' ? (
                                                 <input
                                                   autoFocus
@@ -595,16 +595,16 @@ export default function BudgetTable({
                                               onBlur={() => handleEditSubmit(category.id)}
                                               onFocus={(e) => e.target.select()}
                                               onClick={(e) => e.stopPropagation()}
-                                              className="assigned-input w-full text-right pl-6 pr-2 py-1 border border-[#3B42A4] rounded outline-none shadow-sm text-[13px] text-[#3B42A4] font-semibold bg-white"
+                                              className="assigned-input w-full text-right pl-6 pr-2 py-1 border border-[#3B42A4] rounded outline-none shadow-sm text-[14px] text-[#3B42A4] font-semibold bg-white"
                                             />
                                           </div>
                                         ) : (
-                                          <div className="inline-block px-2.5 py-0.5 rounded-md transition-colors cursor-text text-slate-700 font-medium text-[13px] border border-transparent">
+                                          <div className="inline-block px-2.5 py-0.5 rounded-md transition-colors cursor-text text-slate-700 font-medium text-[14px] border border-transparent">
                                             {formatCurrency(category.assigned)}
                                           </div>
                                         )}
                                       </td>
-                                      <td className="px-5 py-2 text-right font-medium text-slate-500 text-[13px] relative">
+                                      <td className="px-5 py-2 text-right font-medium text-slate-500 text-[14px] relative">
                                         <button 
                                           onClick={(e) => handleActivityClick(e, category.id)}
                                           className="hover:underline hover:text-blue-600 transition-colors"
@@ -673,7 +673,7 @@ export default function BudgetTable({
                                             }
                                           }}
                                           className={`
-                                            inline-block px-3 py-0.5 rounded-full font-bold text-[12px] min-w-[80px] text-center transition-opacity hover:opacity-80 flex items-center justify-end gap-1 ml-auto
+                                            inline-block px-3 py-0.5 rounded-full font-bold text-[13px] min-w-[85px] text-center transition-opacity hover:opacity-80 flex items-center justify-end gap-1 ml-auto
                                             ${getAvailableColor(category)}
                                           `}
                                         >
