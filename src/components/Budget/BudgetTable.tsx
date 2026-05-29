@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { ChevronRight, ChevronDown, Zap, Plus, MoreHorizontal, Check, Minus, GripVertical } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/currency"
-import { addCategory, renameCategory, deleteCategory, renameCategoryGroup, deleteCategoryGroup } from "@/app/actions/budget"
+import { addCategory, renameCategory, deleteCategory, renameCategoryGroup, deleteCategoryGroup, getCategoryTransactions } from "@/app/actions/budget"
 import {
   DndContext,
   closestCenter,
@@ -37,6 +37,7 @@ interface BudgetTableProps {
   onCheckCategory?: (categoryId: string) => void
   onCheckGroup?: (groupId: string) => void
   onCheckAll?: () => void
+  month?: string
 }
 
 const SortableGroupRow = ({ id, className, onClick, onContextMenu, children, isSelected }: any) => {
@@ -80,7 +81,7 @@ const SortableCategoryRow = ({ id, className, onClick, onContextMenu, children, 
 
 export default function BudgetTable({ 
   groups, setGroups, selectedCategoryId, onSelectCategory, onUpdateAssigned, onAvailableClick, onMoveMoney, showProgressBars,
-  checkedCategoryIds, onCheckCategory, onCheckGroup, onCheckAll
+  checkedCategoryIds, onCheckCategory, onCheckGroup, onCheckAll, month
 }: BudgetTableProps) {
   const router = useRouter()
   
@@ -91,6 +92,26 @@ export default function BudgetTable({
   const [newCategoryName, setNewCategoryName] = useState("")
 
   const [inlineEditing, setInlineEditing] = useState<{ id: string, type: 'category' | 'group', name: string } | null>(null)
+
+  const [activityPopoverId, setActivityPopoverId] = useState<string | null>(null)
+  const [activityTransactions, setActivityTransactions] = useState<any[]>([])
+  const [isLoadingActivity, setIsLoadingActivity] = useState(false)
+
+  const handleActivityClick = async (e: React.MouseEvent, categoryId: string) => {
+    e.stopPropagation()
+    if (activityPopoverId === categoryId) {
+      setActivityPopoverId(null)
+      return
+    }
+    setActivityPopoverId(categoryId)
+    setActivityTransactions([])
+    setIsLoadingActivity(true)
+    if (month) {
+      const txs = await getCategoryTransactions(categoryId, month)
+      setActivityTransactions(txs)
+    }
+    setIsLoadingActivity(false)
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -583,8 +604,63 @@ export default function BudgetTable({
                                           </div>
                                         )}
                                       </td>
-                                      <td className="px-5 py-2 text-right font-medium text-slate-500 text-[13px]">
-                                        {formatCurrency(category.activity)}
+                                      <td className="px-5 py-2 text-right font-medium text-slate-500 text-[13px] relative">
+                                        <button 
+                                          onClick={(e) => handleActivityClick(e, category.id)}
+                                          className="hover:underline hover:text-blue-600 transition-colors"
+                                        >
+                                          {formatCurrency(category.activity)}
+                                        </button>
+                                        
+                                        <AnimatePresence>
+                                          {activityPopoverId === category.id && (
+                                            <motion.div
+                                              initial={{ opacity: 0, y: -10 }}
+                                              animate={{ opacity: 1, y: 0 }}
+                                              exit={{ opacity: 0, scale: 0.95 }}
+                                              className="absolute z-[100] right-0 top-10 mt-1 w-[450px] bg-white rounded-xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15)] border border-slate-200 overflow-hidden cursor-default"
+                                              onClick={(e) => e.stopPropagation()}
+                                            >
+                                              <div className="flex flex-col p-3 border-b border-slate-100 bg-white">
+                                                <div className="flex justify-between items-center mb-1">
+                                                  <h3 className="font-semibold text-slate-800 text-[15px]">Activity</h3>
+                                                  <button onClick={() => setActivityPopoverId(null)} className="text-white bg-[#3B42A4] hover:bg-[#2B3180] text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">Close</button>
+                                                </div>
+                                                <div className="text-xs text-slate-500 text-left">{category.name}</div>
+                                              </div>
+                                              <div className="p-0 bg-slate-50 text-left">
+                                                {isLoadingActivity ? (
+                                                  <div className="p-6 text-center text-sm font-medium text-slate-500">Loading activity...</div>
+                                                ) : activityTransactions.length === 0 ? (
+                                                  <div className="p-6 text-center text-sm font-medium text-slate-500">No activity this month.</div>
+                                                ) : (
+                                                  <div className="max-h-[300px] overflow-y-auto">
+                                                    <table className="w-full text-left text-[13px]">
+                                                      <thead className="bg-slate-50 sticky top-0 border-b border-slate-200 shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
+                                                        <tr className="text-slate-500 text-[11px] uppercase tracking-wider">
+                                                          <th className="px-4 py-2.5 font-semibold">Account</th>
+                                                          <th className="px-4 py-2.5 font-semibold">Date</th>
+                                                          <th className="px-4 py-2.5 font-semibold">Payee</th>
+                                                          <th className="px-4 py-2.5 font-semibold text-right">Amount</th>
+                                                        </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                        {activityTransactions.map((t, idx) => (
+                                                          <tr key={t.id} className={`border-b border-slate-100 ${idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'} hover:bg-slate-100 transition-colors`}>
+                                                            <td className="px-4 py-2.5 text-slate-600 truncate max-w-[90px]" title={t.accountName}>{t.accountName}</td>
+                                                            <td className="px-4 py-2.5 text-slate-500 whitespace-nowrap">{new Date(t.date).toLocaleDateString()}</td>
+                                                            <td className="px-4 py-2.5 text-slate-800 font-medium truncate max-w-[110px]" title={t.payeeName || 'Manual Adjustment'}>{t.payeeName || 'Manual Adjustment'}</td>
+                                                            <td className="px-4 py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">{formatCurrency(t.amount)}</td>
+                                                          </tr>
+                                                        ))}
+                                                      </tbody>
+                                                    </table>
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </motion.div>
+                                          )}
+                                        </AnimatePresence>
                                       </td>
                                       <td className="px-5 py-2 text-right relative">
                                         <button

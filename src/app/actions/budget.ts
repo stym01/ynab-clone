@@ -224,6 +224,45 @@ export async function updateCategoryTarget(categoryId: string, targetType: strin
   revalidatePath("/budget")
 }
 
+export async function getCategoryTransactions(categoryId: string, month: string) {
+  const user = await requireUser()
+  
+  // month is "YYYY-MM"
+  const [y, m] = month.split('-')
+  const startDate = new Date(Date.UTC(parseInt(y), parseInt(m) - 1, 1))
+  const endDate = new Date(Date.UTC(parseInt(y), parseInt(m), 1))
+
+  const transactions = await prisma.transaction.findMany({
+    where: {
+      categoryId,
+      date: {
+        gte: startDate,
+        lt: endDate
+      },
+      account: {
+        budget: {
+          userId: user.id
+        }
+      }
+    },
+    include: {
+      account: { select: { name: true } },
+      payee: { select: { name: true } }
+    },
+    orderBy: { date: 'desc' }
+  })
+
+  // We need to map and format it slightly so it's clean for the UI
+  return transactions.map(t => ({
+    id: t.id,
+    date: t.date.toISOString(),
+    accountName: t.account.name,
+    payeeName: t.payee?.name || '',
+    memo: t.memo || '',
+    amount: t.amount
+  }))
+}
+
 export async function createBudget(name: string) {
   const user = await requireUser()
   const budget = await prisma.budget.create({

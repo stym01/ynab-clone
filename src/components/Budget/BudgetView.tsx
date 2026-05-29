@@ -490,6 +490,7 @@ export default function BudgetView({
             onCheckCategory={handleCheckCategory}
             onCheckGroup={handleCheckGroup}
             onCheckAll={handleCheckAll}
+            month={month}
             onAvailableClick={(categoryId) => {
               setMoveMoneyInitialFrom(categoryId)
               setIsMoveMoneyOpen(true)
