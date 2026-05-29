@@ -52,7 +52,8 @@ export async function createAccount(name: string, type: string, startingBalanceC
       data: {
         groupId: ccGroup.id,
         name: name,
-        sortOrder: 0
+        sortOrder: 0,
+        linkedAccountId: account.id
       }
     })
   }

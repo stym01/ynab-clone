@@ -125,6 +125,7 @@ model Category {
   targetRepeatCadence String?  // "MONTHS" | "YEARS"
   sortOrder   Int      @default(0)
   isHidden    Boolean  @default(false)
+  linkedAccountId String? // Identifies if this is a Credit Card Payment category
 
   transactions Transaction[]
   subTransactions SubTransaction[]

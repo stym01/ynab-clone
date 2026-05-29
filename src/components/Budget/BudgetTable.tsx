@@ -494,7 +494,9 @@ export default function BudgetTable({
                                   {(listeners: any, attributes: any) => (
                                     <>
                                       <td className="px-5 py-2" onDoubleClick={() => {
-                                        setInlineEditing({ id: category.id, type: 'category', name: category.name })
+                                        if (!category.linkedAccountId) {
+                                          setInlineEditing({ id: category.id, type: 'category', name: category.name })
+                                        }
                                       }}>
                                         <div className="flex flex-col gap-1 ml-6 relative">
                                           <div className="flex items-center gap-2">
@@ -778,12 +780,15 @@ export default function BudgetTable({
               className="fixed z-50 bg-white rounded-lg shadow-xl border border-slate-200 py-1.5 w-48"
               style={{ left: contextMenu.x, top: contextMenu.y }}
             >
-              {contextMenu.type === 'category' ? (
-                <>
-                  <button onClick={() => handleRenameCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Rename</button>
-                  <button onClick={() => handleDeleteCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600">Delete</button>
-                </>
-              ) : (
+              {contextMenu.type === 'category' ? (() => {
+                const isLinkedCC = groups.flatMap((g: any) => g.categories).find((c: any) => c.id === contextMenu.id)?.linkedAccountId;
+                return (
+                  <>
+                    {!isLinkedCC && <button onClick={() => handleRenameCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Rename</button>}
+                    {!isLinkedCC && <button onClick={() => handleDeleteCategory(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-600">Delete</button>}
+                  </>
+                )
+              })() : (
                 <>
                   <button onClick={() => handleRenameGroup(contextMenu.id)} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Rename Group</button>
                   <button onClick={() => { setAddingCategoryGroupId(contextMenu.id); setContextMenu(null) }} className="w-full text-left px-4 py-2 text-sm hover:bg-slate-50 text-slate-700">Add Category</button>

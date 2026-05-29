@@ -46,61 +46,125 @@ export async function getBudgetData(month: string) {
   let totalAssignedAllTime = 0
   let totalOverspendingAbsorbedRTA = 0
 
+  const ccAccounts = budget.accounts.filter(a => a.type === 'creditCard')
+  
+  const allMonthsSet = new Set<string>()
+  budget.categoryGroups.forEach(g => g.categories.forEach(c => {
+    c.monthlyBudgets.forEach(m => allMonthsSet.add(m.month))
+  }))
+  allTransactions.forEach(t => allMonthsSet.add(t.date.toISOString().substring(0, 7)))
+  allMonthsSet.add(month)
+  const allMonths = Array.from(allMonthsSet).sort().filter(m => m <= month)
+  
+  const fundedCCSpending: Record<string, Record<string, number>> = {}
+  
+  const startOfMonthRollover: Record<string, number> = {}
+  const currentMonthAvailable: Record<string, number> = {}
+  const currentMonthActivity: Record<string, number> = {}
+
+  budget.categoryGroups.forEach(g => g.categories.forEach(category => {
+    startOfMonthRollover[category.id] = 0
+  }))
+
+  for (const m of allMonths) {
+    fundedCCSpending[m] = {}
+    ccAccounts.forEach(cc => fundedCCSpending[m][cc.id] = 0)
+
+    budget.categoryGroups.forEach(g => g.categories.forEach(category => {
+      if (category.linkedAccountId) return
+      
+      const mAssigned = category.monthlyBudgets.find(mb => mb.month === m)?.assigned || 0
+      const mTransactions = allTransactions.filter(t => t.categoryId === category.id && t.date.toISOString().startsWith(m))
+      
+      const inflows = mTransactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0)
+      const outflows = Math.abs(mTransactions.filter(t => t.amount < 0).reduce((sum, t) => sum + t.amount, 0))
+      const cashOutflows = Math.abs(mTransactions.filter(t => t.amount < 0 && !ccAccounts.some(cc => cc.id === t.accountId)).reduce((sum, t) => sum + t.amount, 0))
+      
+      const ccOutflowsByAccount: Record<string, number> = {}
+      ccAccounts.forEach(cc => ccOutflowsByAccount[cc.id] = 0)
+      mTransactions.filter(t => t.amount < 0 && ccAccounts.some(cc => cc.id === t.accountId)).forEach(t => {
+        ccOutflowsByAccount[t.accountId] += Math.abs(t.amount)
+      })
+      
+      const totalCCOutflows = Object.values(ccOutflowsByAccount).reduce((sum, val) => sum + val, 0)
+      
+      const startingAvailable = startOfMonthRollover[category.id] + mAssigned + inflows
+      const availableForCC = Math.max(0, startingAvailable - cashOutflows)
+      const totalFundedCC = Math.min(totalCCOutflows, availableForCC)
+      
+      if (totalCCOutflows > 0 && totalFundedCC > 0) {
+        Object.entries(ccOutflowsByAccount).forEach(([ccId, amount]) => {
+          const share = amount / totalCCOutflows
+          fundedCCSpending[m][ccId] += totalFundedCC * share
+        })
+      }
+      
+      const mAvailable = startingAvailable - cashOutflows - totalCCOutflows
+      
+      if (m === month) {
+        currentMonthActivity[category.id] = inflows - outflows
+        currentMonthAvailable[category.id] = mAvailable
+      }
+      
+      if (mAvailable < 0) {
+        const cashOverspending = Math.max(0, cashOutflows - startingAvailable)
+        if (m < month) {
+          totalOverspendingAbsorbedRTA += cashOverspending
+        }
+        if (m !== month) startOfMonthRollover[category.id] = 0
+      } else {
+        if (m !== month) startOfMonthRollover[category.id] = mAvailable
+      }
+    }))
+  }
+  
+  for (const m of allMonths) {
+    budget.categoryGroups.forEach(g => g.categories.forEach(category => {
+      if (!category.linkedAccountId) return
+      
+      const ccId = category.linkedAccountId
+      const mAssigned = category.monthlyBudgets.find(mb => mb.month === m)?.assigned || 0
+      const mFunded = fundedCCSpending[m]?.[ccId] || 0
+      const mPayments = allTransactions
+        .filter(t => t.accountId === ccId && !t.categoryId && t.amount > 0 && t.date.toISOString().startsWith(m))
+        .reduce((sum, t) => sum + t.amount, 0)
+        
+      const mActivity = mFunded - mPayments
+      const mAvailable = startOfMonthRollover[category.id] + mAssigned + mActivity
+      
+      if (m === month) {
+        currentMonthActivity[category.id] = mActivity
+        currentMonthAvailable[category.id] = mAvailable
+      }
+      
+      if (m !== month) {
+        startOfMonthRollover[category.id] = mAvailable
+      }
+    }))
+  }
+
   const processedGroups = budget.categoryGroups.map(group => {
     const categories = group.categories.map(category => {
       
-      // Calculate Activity for the specific requested month
-      const currentMonthActivity = allTransactions
-        .filter(t => t.categoryId === category.id && t.date.toISOString().startsWith(month))
-        .reduce((sum, t) => sum + t.amount, 0)
-      
       const currentMonthAssigned = category.monthlyBudgets.find(m => m.month === month)?.assigned || 0
+      const currentMonthActivityVal = currentMonthActivity[category.id] || 0
+      const available = currentMonthAvailable[category.id] || 0
+      const rollover = startOfMonthRollover[category.id] || 0
       
-      // Calculate Rollover from previous months
-      let rollover = 0
-      
-      // Sort months chronologically
-      const allMonths = [...new Set([
-        ...category.monthlyBudgets.map(m => m.month),
-        ...allTransactions.filter(t => t.categoryId === category.id).map(t => t.date.toISOString().substring(0, 7))
-      ])].sort()
-
-      for (const m of allMonths) {
-        if (m >= month) break // Only calculate up to the month BEFORE the requested month
-        
-        const mAssigned = category.monthlyBudgets.find(mb => mb.month === m)?.assigned || 0
-        const mActivity = allTransactions
-          .filter(t => t.categoryId === category.id && t.date.toISOString().startsWith(m))
-          .reduce((sum, t) => sum + t.amount, 0)
-        
-        const mAvailable = rollover + mAssigned + mActivity
-        
-        if (mAvailable < 0) {
-          // Cash overspending is absorbed by RTA in the next month, so rollover resets to 0
-          totalOverspendingAbsorbedRTA += Math.abs(mAvailable)
-          rollover = 0
-        } else {
-          // Positive balance rolls over
-          rollover = mAvailable
-        }
-      }
-
-      const available = rollover + currentMonthAssigned + currentMonthActivity
-      
-      // Add to global assigned total
       totalAssignedAllTime += category.monthlyBudgets.reduce((sum, m) => sum + m.assigned, 0)
 
-      // Get previous month string
-      const [y, m] = month.split('-')
-      const prevDate = new Date(parseInt(y), parseInt(m) - 2, 1)
+      const [y, mStr] = month.split('-')
+      const prevDate = new Date(parseInt(y), parseInt(mStr) - 2, 1)
       const prevMonthStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`
 
       const assignedLastMonth = category.monthlyBudgets.find(m => m.month === prevMonthStr)?.assigned || 0
-      const spentLastMonth = Math.abs(allTransactions
-        .filter(t => t.categoryId === category.id && t.date.toISOString().startsWith(prevMonthStr) && t.amount < 0)
-        .reduce((sum, t) => sum + t.amount, 0))
+      let spentLastMonth = 0
+      if (!category.linkedAccountId) {
+        spentLastMonth = Math.abs(allTransactions
+          .filter(t => t.categoryId === category.id && t.date.toISOString().startsWith(prevMonthStr) && t.amount < 0)
+          .reduce((sum, t) => sum + t.amount, 0))
+      }
 
-      // NEW LOGIC: Calculate Monthly Target Amount for Advanced Targets
       let monthlyTargetAmount = category.target
       
       let effectiveTargetDate = category.targetDate ? new Date(category.targetDate) : null
@@ -108,9 +172,8 @@ export async function getBudgetData(month: string) {
       if (category.target > 0) {
         if (category.targetCadence === 'YEARLY' || category.targetCadence === 'BY_DATE') {
           if (effectiveTargetDate) {
-            const currentMonthDate = new Date(parseInt(y), parseInt(m) - 1, 1)
+            const currentMonthDate = new Date(parseInt(y), parseInt(mStr) - 1, 1)
             
-            // Advance target date if repeating and in the past
             if (category.targetRepeatEvery && category.targetRepeatCadence && effectiveTargetDate < currentMonthDate) {
               while (effectiveTargetDate < currentMonthDate) {
                 if (category.targetRepeatCadence === 'MONTHS') {
@@ -121,17 +184,12 @@ export async function getBudgetData(month: string) {
               }
             }
             
-            // Calculate months difference
             let monthsLeft = (effectiveTargetDate.getFullYear() - currentMonthDate.getFullYear()) * 12 
                            + (effectiveTargetDate.getMonth() - currentMonthDate.getMonth())
                            
-            // If the target is in the past or this month, monthsLeft should be at least 1
             if (monthsLeft < 1) monthsLeft = 1
             
-            // Remaining needed is Total Target - What we had available at the START of the month
             const remainingToFund = Math.max(0, category.target - rollover)
-            
-            // The monthly goal is the remaining amount divided by months left
             monthlyTargetAmount = Math.ceil(remainingToFund / monthsLeft)
           }
         }
@@ -141,18 +199,19 @@ export async function getBudgetData(month: string) {
         id: category.id,
         name: category.name,
         assigned: currentMonthAssigned,
-        activity: currentMonthActivity,
+        activity: currentMonthActivityVal,
         available: available,
         assignedLastMonth,
         spentLastMonth,
         targetType: category.targetType,
         target: category.target,
         targetCadence: category.targetCadence,
-        targetDate: category.targetDate, // Or return effectiveTargetDate if you want the UI to show the next one! Let's return effectiveTargetDate.
+        targetDate: category.targetDate,
         effectiveTargetDate: effectiveTargetDate,
         targetRepeatEvery: category.targetRepeatEvery,
         targetRepeatCadence: category.targetRepeatCadence,
         monthlyTargetAmount: monthlyTargetAmount,
+        linkedAccountId: category.linkedAccountId,
       }
     })
 
@@ -164,6 +223,7 @@ export async function getBudgetData(month: string) {
       categories
     }
   })
+
 
   // Calculate Ready to Assign
   allTransactions.forEach(t => {
