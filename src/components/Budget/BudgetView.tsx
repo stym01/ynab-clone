@@ -247,7 +247,7 @@ export default function BudgetView({
       filteredCategories = g.categories.filter((c: any) => c.available > 0)
     }
     return { ...g, categories: filteredCategories }
-  }).filter((g: any) => g.categories.length > 0)
+  }).filter((g: any) => activeFilter === 'all' || g.categories.length > 0)
 
   // Find selected category data
   let selectedCategoryData = null
