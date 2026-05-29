@@ -163,8 +163,6 @@ export async function getBudgetData(month: string) {
       isExpanded: true,
       categories
     }
-      categories
-    }
   })
 
   // Calculate Ready to Assign
