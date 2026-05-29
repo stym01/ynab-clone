@@ -22,6 +22,63 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
   const [accountToEdit, setAccountToEdit] = useState<any>(null)
   const [isBudgetDropdownOpen, setIsBudgetDropdownOpen] = useState(false)
   const [showBudgetAccounts, setShowBudgetAccounts] = useState(true)
+  const [isImporting, setIsImporting] = useState(false)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
+  const handleExport = async () => {
+    if (!activeBudget) return
+    try {
+      const res = await fetch(`/api/export?budgetId=${activeBudget.id}`)
+      if (!res.ok) throw new Error('Export failed')
+      const data = await res.json()
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `ynab-export-${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
+      setIsBudgetDropdownOpen(false)
+    } catch (e) {
+      alert("Failed to export data")
+    }
+  }
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    
+    setIsImporting(true)
+    try {
+      const text = await file.text()
+      const data = JSON.parse(text)
+      
+      const res = await fetch('/api/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      
+      if (!res.ok) throw new Error('Import failed')
+      
+      const newBudget = await res.json()
+      // Switch to the newly imported budget
+      const { switchBudget } = await import("@/app/actions/budget")
+      await switchBudget(newBudget.id)
+      
+      alert("Budget imported successfully!")
+      setIsBudgetDropdownOpen(false)
+      window.location.reload() // Force full reload to refresh all data globally
+    } catch (e) {
+      alert("Failed to import budget. Please check the file format.")
+    } finally {
+      setIsImporting(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
 
   React.useEffect(() => {
     if (externalCollapsed !== null && externalCollapsed !== undefined) {
@@ -115,6 +172,26 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                         >
                           + Create New Budget
                         </button>
+                        <button 
+                          onClick={handleExport}
+                          className="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm font-medium text-slate-600 flex items-center gap-2"
+                        >
+                          Export Data (JSON)
+                        </button>
+                        <button 
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={isImporting}
+                          className="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm font-medium text-slate-600 flex items-center gap-2 disabled:opacity-50"
+                        >
+                          {isImporting ? 'Importing...' : 'Import Data (JSON)'}
+                        </button>
+                        <input 
+                          type="file" 
+                          accept=".json" 
+                          ref={fileInputRef} 
+                          onChange={handleImport} 
+                          className="hidden" 
+                        />
                       </div>
                     </motion.div>
                   )}
