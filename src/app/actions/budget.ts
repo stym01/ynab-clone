@@ -115,8 +115,11 @@ export async function getBudgetData(month: string) {
 
     return {
       id: group.id,
+      budgetId: group.budgetId,
       name: group.name,
       isExpanded: true,
+      categories
+    }
       categories
     }
   })
