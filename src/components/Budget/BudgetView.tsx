@@ -16,7 +16,6 @@ interface BudgetViewProps {
   totalInflows?: number
   totalAssigned?: number
   totalOverspending?: number
-  monthNote?: string
 }
 
 export default function BudgetView({
@@ -25,8 +24,7 @@ export default function BudgetView({
   readyToAssign = 0,
   totalInflows = 0,
   totalAssigned = 0,
-  totalOverspending = 0,
-  monthNote = ""
+  totalOverspending = 0
 }: BudgetViewProps) {
   const router = useRouter()
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
@@ -327,8 +325,6 @@ export default function BudgetView({
         onAutoAssignUnderfunded={handleAutoAssignUnderfunded}
         onAutoAssignLastMonth={handleAutoAssignLastMonth}
         onResetAssigned={handleResetAssigned}
-        monthNote={monthNote}
-        budgetId={initialData?.id || ""}
       />
       <div className="flex flex-1 overflow-hidden bg-slate-50">
         {isMoveMoneyOpen && (
@@ -358,7 +354,7 @@ export default function BudgetView({
               onClick={() => setActiveFilter('overspent')}
               className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'overspent' ? 'bg-red-50 border-red-200 text-[#E54545]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
             >
-              Overspent
+              Overfunded
             </button>
             <button
               onClick={() => setActiveFilter('available')}

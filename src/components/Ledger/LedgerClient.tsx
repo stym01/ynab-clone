@@ -35,7 +35,16 @@ export default function LedgerClient({ account, categories, payees }: LedgerClie
   
   const [pendingFlagAction, setPendingFlagAction] = useState(false)
 
-  // Auto-refresh polling removed to prevent annoying re-renders
+  // Auto-refresh polling to provide a real-time UI feel for webhooks
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      // Only refresh if the user is actively looking at the tab to save resources
+      if (document.visibilityState === 'visible') {
+        router.refresh()
+      }
+    }, 4000); // 4 seconds
+    return () => clearInterval(interval);
+  }, [router]);
   
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

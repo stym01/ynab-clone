@@ -15,8 +15,6 @@ interface InspectorProps {
 
 export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarget, groups = [], month }: InspectorProps) {
   const [isEditingTarget, setIsEditingTarget] = useState(false)
-  const [isEditingName, setIsEditingName] = useState(false)
-  const [editName, setEditName] = useState(categoryData?.name || "")
   const [editTargetType, setEditTargetType] = useState("NEEDED_FOR_SPENDING")
   const [editTargetAmount, setEditTargetAmount] = useState("")
   const [editTargetCadence, setEditTargetCadence] = useState("MONTHLY")
@@ -29,36 +27,11 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
   const [isTargetOpen, setIsTargetOpen] = useState(false)
   const [isAutoAssignOpen, setIsAutoAssignOpen] = useState(false)
 
-  const [note, setNote] = useState("")
-
-  React.useEffect(() => {
-    if (categoryData) {
-      setNote(categoryData.note || "")
-      setEditName(categoryData.name || "")
-    }
-  }, [categoryData?.id, categoryData?.note, categoryData?.name])
-
-  const handleNoteBlur = async () => {
-    if (categoryData && note !== (categoryData.note || "")) {
-      const { updateCategoryNote } = await import("@/app/actions/budget")
-      await updateCategoryNote(categoryData.id, month || "", note)
-    }
-  }
-
-  const handleSaveName = async () => {
-    if (categoryData && editName.trim() && editName !== categoryData.name) {
-      const { renameCategory } = await import("@/app/actions/budget")
-      await renameCategory(categoryData.id, editName.trim())
-    }
-    setIsEditingName(false)
-  }
-
   if (!categoryData) {
     const totalBudgeted = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.assigned, 0), 0)
     const totalActivity = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.activity, 0), 0)
     const totalAvailable = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + c.available, 0), 0)
     const totalTargets = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + (c.monthlyTargetAmount || c.target || 0), 0), 0)
-    const totalRollover = groups.reduce((sum, g) => sum + g.categories.reduce((s: number, c: any) => s + (c.rollover || 0), 0), 0)
 
     const dateObj = new Date((month || "2026-05") + "-01T00:00:00")
     const readableMonth = dateObj.toLocaleDateString('en-US', { month: 'long' })
@@ -73,7 +46,7 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
           <div className="flex flex-col gap-3 mb-6 pb-6 border-b border-slate-200">
             <div className="flex justify-between text-sm">
               <span className="text-slate-600 font-medium">Left Over from Last Month</span>
-              <span className="font-semibold text-slate-800">{formatCurrency(totalRollover)}</span>
+              <span className="font-semibold text-slate-800">{formatCurrency(0)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-600 font-medium">Assigned in {readableMonth}</span>
@@ -272,14 +245,8 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
                 )}
                 
                 <div className="pt-3 mt-1 border-t border-slate-100 flex justify-center">
-                  <button 
-                    onClick={async () => {
-                      const { toggleSnoozeTarget } = await import("@/app/actions/budget")
-                      await toggleSnoozeTarget(categoryData.id, month || "", !categoryData.snoozed)
-                    }}
-                    className="text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors"
-                  >
-                    {categoryData.snoozed ? "Unsnooze Target" : "Snooze Target"}
+                  <button className="text-[13px] font-medium text-slate-500 hover:text-slate-800 transition-colors">
+                    Snooze Target
                   </button>
                 </div>
               </div>
@@ -428,34 +395,9 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
         <div className="flex flex-col p-6 gap-4">
           {/* Title */}
           <div className="flex items-center justify-between">
-            {isEditingName ? (
-              <div className="flex items-center gap-2 w-full">
-                <input
-                  type="text"
-                  autoFocus
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveName()
-                    if (e.key === 'Escape') {
-                      setEditName(categoryData.name)
-                      setIsEditingName(false)
-                    }
-                  }}
-                  onBlur={handleSaveName}
-                  className="text-[22px] font-bold text-slate-900 border-b-2 border-[#5155C3] outline-none bg-transparent w-full"
-                />
-              </div>
-            ) : (
-              <h2 className="text-[22px] font-bold text-slate-900 flex items-center gap-2 group">
-                {categoryData.name} 
-                <Pencil 
-                  size={14} 
-                  className="text-slate-400 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#5155C3]" 
-                  onClick={() => setIsEditingName(true)}
-                />
-              </h2>
-            )}
+            <h2 className="text-[22px] font-bold text-slate-900 flex items-center gap-2">
+              {categoryData.name} <Pencil size={14} className="text-slate-400 cursor-pointer hover:text-slate-600" />
+            </h2>
           </div>
 
           {/* Available Balance Card */}
@@ -482,7 +424,7 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
                   <div className="p-4 flex flex-col gap-2.5 text-[13px]">
                     <div className="flex justify-between items-center text-slate-500">
                       <span>Cash Left Over From Last Month</span>
-                      <span className="font-medium">{formatCurrency(categoryData.rollover || 0)}</span>
+                      <span className="font-medium">{formatCurrency(0)}</span>
                     </div>
                     <div className="flex justify-between items-center text-slate-500">
                       <span>Assigned This Month</span>
@@ -549,29 +491,20 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
                       <span>Spent Last Month</span>
                       <span>{formatCurrency(categoryData.spentLastMonth || 0)}</span>
                     </button>
-                    <button 
-                      onClick={() => onUpdateAssigned(categoryData.id, categoryData.assigned + (categoryData.averageAssigned || 0))}
-                      className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors"
-                    >
+                    <button className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors">
                       <span>Average Assigned</span>
-                      <span>{formatCurrency(categoryData.averageAssigned || 0)}</span>
+                      <span>{formatCurrency(0)}</span>
                     </button>
-                    <button 
-                      onClick={() => onUpdateAssigned(categoryData.id, categoryData.assigned + (categoryData.averageSpent || 0))}
-                      className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors"
-                    >
+                    <button className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors">
                       <span>Average Spent</span>
-                      <span>{formatCurrency(categoryData.averageSpent || 0)}</span>
+                      <span>{formatCurrency(0)}</span>
                     </button>
                     
                     <div className="h-px bg-slate-100 my-2 mx-2"></div>
                     
-                    <button 
-                      onClick={() => onUpdateAssigned(categoryData.id, categoryData.assigned - categoryData.available)}
-                      className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors"
-                    >
+                    <button className="flex justify-between items-center px-2 py-2 rounded hover:bg-slate-50 text-[#3B42A4] font-medium transition-colors">
                       <span>Reset Available Amount</span>
-                      <span>{formatCurrency(categoryData.assigned - categoryData.available)}</span>
+                      <span>{formatCurrency(0)}</span>
                     </button>
                     <button 
                       onClick={() => onUpdateAssigned(categoryData.id, 0)}
@@ -590,9 +523,6 @@ export default function Inspector({ categoryData, onUpdateAssigned, onUpdateTarg
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mt-2 flex flex-col gap-2">
             <h3 className="text-sm font-semibold text-slate-800">Notes</h3>
             <textarea 
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              onBlur={handleNoteBlur}
               className="w-full h-24 text-sm text-slate-600 outline-none resize-none bg-transparent placeholder:text-slate-400"
               placeholder="Enter a note..."
             />

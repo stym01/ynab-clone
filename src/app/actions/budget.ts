@@ -165,18 +165,6 @@ export async function getBudgetData(month: string) {
           .reduce((sum, t) => sum + t.amount, 0))
       }
 
-      const totalAssignedForAvg = category.monthlyBudgets.reduce((sum, m) => sum + m.assigned, 0)
-      const numMonthsAssigned = category.monthlyBudgets.filter(m => m.assigned > 0).length || 1
-      const averageAssigned = Math.round(totalAssignedForAvg / numMonthsAssigned)
-
-      let averageSpent = 0
-      if (!category.linkedAccountId) {
-        const spentTxs = allTransactions.filter(t => t.categoryId === category.id && t.amount < 0)
-        const totalSpent = Math.abs(spentTxs.reduce((sum, t) => sum + t.amount, 0))
-        const uniqueMonths = new Set(spentTxs.map(t => t.date.toISOString().substring(0, 7))).size || 1
-        averageSpent = Math.round(totalSpent / uniqueMonths)
-      }
-
       let monthlyTargetAmount = category.target
       
       let effectiveTargetDate = category.targetDate ? new Date(category.targetDate) : null
@@ -224,11 +212,6 @@ export async function getBudgetData(month: string) {
         targetRepeatCadence: category.targetRepeatCadence,
         monthlyTargetAmount: monthlyTargetAmount,
         linkedAccountId: category.linkedAccountId,
-        note: category.monthlyBudgets.find(m => m.month === month)?.note || '',
-        snoozed: category.monthlyBudgets.find(m => m.month === month)?.snoozed || false,
-        rollover: rollover,
-        averageAssigned,
-        averageSpent,
       }
     })
 
@@ -252,17 +235,12 @@ export async function getBudgetData(month: string) {
   // Ready To Assign = Total Inflows - Total Assigned - Overspending Absorbed
   const readyToAssign = totalInflowsToRTA - totalAssignedAllTime - totalOverspendingAbsorbedRTA
 
-  const monthMeta = await prisma.monthMeta.findFirst({
-    where: { budgetId: budget.id, month }
-  })
-
   return { 
     budget: { ...budget, categoryGroups: processedGroups }, 
     readyToAssign,
     totalInflows: totalInflowsToRTA,
     totalAssigned: totalAssignedAllTime,
-    totalOverspending: totalOverspendingAbsorbedRTA,
-    monthNote: monthMeta?.note || ""
+    totalOverspending: totalOverspendingAbsorbedRTA
   }
 }
 
@@ -283,59 +261,6 @@ export async function updateCategoryAssigned(categoryId: string, month: string, 
     }
   })
 
-  revalidatePath("/budget")
-}
-
-export async function updateMonthNote(budgetId: string, month: string, note: string) {
-  const user = await requireUser()
-
-  await prisma.monthMeta.upsert({
-    where: {
-      budgetId_month: { budgetId, month }
-    },
-    update: {
-      note
-    },
-    create: {
-      budgetId,
-      month,
-      note
-    }
-  })
-
-  revalidatePath("/budget")
-}
-
-export async function updateCategoryNote(categoryId: string, month: string, note: string) {
-  const user = await requireUser()
-
-  await prisma.monthlyBudget.upsert({
-    where: {
-      categoryId_month: { categoryId, month }
-    },
-    update: {
-      note
-    },
-    create: {
-      categoryId,
-      month,
-      note
-    }
-  })
-
-  // We don't necessarily want to revalidate the whole path on every keystroke,
-  // but since we'll debounce it in the client, it's fine.
-  revalidatePath("/budget")
-}
-
-export async function toggleSnoozeTarget(categoryId: string, month: string, snoozed: boolean) {
-  const user = await requireUser()
-
-  await prisma.monthlyBudget.upsert({
-    where: { categoryId_month: { categoryId, month } },
-    update: { snoozed },
-    create: { categoryId, month, snoozed }
-  })
   revalidatePath("/budget")
 }
 
