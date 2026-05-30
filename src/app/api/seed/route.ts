@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { requireUser } from '@/lib/session';
 
 export async function GET(request: Request) {
   try {
-    const email = 'satyamkesharwani134@gmail.com';
-    let user = await prisma.user.findUnique({ where: { email } });
+    const user = await requireUser();
     if (!user) {
-      console.log('User not found, creating user...');
-      user = await prisma.user.create({ data: { email, name: 'Satyam' } });
+      return NextResponse.json({ success: false, error: 'Not logged in' }, { status: 401 });
     }
 
     let budget = await prisma.budget.findFirst({ where: { userId: user.id } });
@@ -98,7 +97,7 @@ export async function GET(request: Request) {
       groupSortOrder++;
     }
     
-    return NextResponse.json({ success: true, message: 'Successfully seeded categories for ' + email });
+    return NextResponse.json({ success: true, message: 'Successfully seeded categories for ' + user.email });
   } catch (error: any) {
     console.error(error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
