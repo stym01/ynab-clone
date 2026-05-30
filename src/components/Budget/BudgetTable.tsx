@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { ChevronRight, ChevronDown, Zap, Plus, MoreHorizontal, Check, Minus, GripVertical } from "lucide-react"
+import { ChevronRight, ChevronDown, Zap, Plus, MoreHorizontal, Check, Minus } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { formatCurrency } from "@/lib/currency"
 import { addCategory, renameCategory, deleteCategory, renameCategoryGroup, deleteCategoryGroup, getCategoryTransactions } from "@/app/actions/budget"
@@ -49,10 +49,11 @@ const SortableGroupRow = ({ id, className, onClick, onContextMenu, children, isS
     opacity: isDragging ? 0.9 : 1,
     position: isDragging ? 'relative' : undefined,
     backgroundColor: isDragging ? '#EEF2FC' : undefined,
+    cursor: 'grab',
   };
   return (
-    <tr ref={setNodeRef} style={style} className={className} onClick={onClick} onContextMenu={onContextMenu}>
-      {children(listeners, attributes)}
+    <tr ref={setNodeRef} style={style} className={className} onClick={onClick} onContextMenu={onContextMenu} {...listeners} {...attributes}>
+      {children()}
     </tr>
   );
 };
@@ -66,6 +67,7 @@ const SortableCategoryRow = ({ id, className, onClick, onContextMenu, children, 
     opacity: isDragging ? 0.9 : 1,
     position: isDragging ? 'relative' : undefined,
     backgroundColor: isDragging ? '#EEF2FC' : undefined,
+    cursor: 'grab',
   };
   return (
     <motion.tr 
@@ -73,8 +75,8 @@ const SortableCategoryRow = ({ id, className, onClick, onContextMenu, children, 
       animate={{ opacity: 1, height: 'auto' }}
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.12 }}
-      ref={setNodeRef} style={style} className={className} onClick={onClick} onContextMenu={onContextMenu}>
-      {children(listeners, attributes)}
+      ref={setNodeRef} style={style} className={className} onClick={onClick} onContextMenu={onContextMenu} {...listeners} {...attributes}>
+      {children()}
     </motion.tr>
   );
 };
@@ -409,15 +411,12 @@ export default function BudgetTable({
                         onClick={() => { toggleGroup(group.id); onSelectCategory(group.id); }}
                         onContextMenu={(e: React.MouseEvent) => handleContextMenu(e, 'group', group.id)}
                       >
-                        {(listeners: any, attributes: any) => (
+                        {() => (
                           <>
                             <td className="px-5 py-2.5" onDoubleClick={() => {
                               setInlineEditing({ id: group.id, type: 'group', name: group.name })
                             }}>
                               <div className="flex items-center gap-2">
-                                <div {...listeners} {...attributes} className="cursor-grab hover:bg-slate-300 p-0.5 rounded text-slate-400 opacity-0 group-hover/row:opacity-100 transition-opacity">
-                                  <GripVertical size={14} />
-                                </div>
                                 <span className="text-slate-400 group-hover/row:text-slate-600 transition-colors" onClick={(e) => { e.stopPropagation(); toggleGroup(group.id) }}>
                                   {group.isExpanded ? <ChevronDown size={14}/> : <ChevronRight size={14}/>}
                                 </span>
@@ -491,18 +490,16 @@ export default function BudgetTable({
                                   onClick={() => onSelectCategory(category.id)}
                                   onContextMenu={(e: React.MouseEvent) => handleContextMenu(e, 'category', category.id)}
                                 >
-                                  {(listeners: any, attributes: any) => (
+                                  {() => (
                                     <>
-                                      <td className="px-5 py-2" onDoubleClick={() => {
+                                      <td className="px-5 py-2" onDoubleClick={(e) => {
+                                        e.stopPropagation();
                                         if (!category.linkedAccountId) {
                                           setInlineEditing({ id: category.id, type: 'category', name: category.name })
                                         }
                                       }}>
                                         <div className="flex flex-col gap-1 ml-6 relative">
                                           <div className="flex items-center gap-2">
-                                            <div {...listeners} {...attributes} className="cursor-grab hover:bg-slate-200 p-0.5 rounded text-slate-300 opacity-0 group-hover/cat:opacity-100 transition-opacity absolute -left-6">
-                                              <GripVertical size={14} />
-                                            </div>
                                             <div 
                                               onClick={(e) => { e.stopPropagation(); onCheckCategory?.(category.id); }}
                                               className={`w-3.5 h-3.5 rounded-[3px] flex items-center justify-center border transition-colors flex-shrink-0 cursor-pointer ${isChecked ? 'bg-[#5155C3] border-[#5155C3]' : 'border-slate-300 bg-white'}`}
