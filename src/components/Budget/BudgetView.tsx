@@ -361,6 +361,7 @@ export default function BudgetView({
               className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'available' ? 'bg-green-50 border-green-200 text-[#23B573]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
             >
               Money Available
+            </button>
           </div>
 
           {/* Toolbar Row */}
