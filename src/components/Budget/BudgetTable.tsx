@@ -407,7 +407,7 @@ export default function BudgetTable({
                     <React.Fragment key={group.id}>
                       <SortableGroupRow 
                         id={group.id}
-                        className={`cursor-pointer transition-colors border-t-2 border-t-[#888888] border-b border-b-[#CCCCCC] group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#EDE9E0] hover:bg-[#E5E1D8]'}`}
+                        className={`cursor-pointer transition-colors border-t border-t-[#E8E4DC] border-b border-b-[#CCCCCC] group/row ${selectedCategoryId === group.id ? 'bg-[#EEF2FC]' : 'bg-[#EDE9E0] hover:bg-[#E5E1D8]'}`}
                         onClick={() => { toggleGroup(group.id); onSelectCategory(group.id); }}
                         onContextMenu={(e: React.MouseEvent) => handleContextMenu(e, 'group', group.id)}
                       >

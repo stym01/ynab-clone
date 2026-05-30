@@ -361,15 +361,6 @@ export default function BudgetView({
               className={`px-4 py-1.5 text-[13px] font-bold rounded-lg border transition-colors ${activeFilter === 'available' ? 'bg-green-50 border-green-200 text-[#23B573]' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'}`}
             >
               Money Available
-            </button>
-            <button
-              className="px-4 py-1.5 text-[13px] font-bold rounded-lg border bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 transition-colors"
-            >
-              Snoozed
-            </button>
-            <button className="p-1 text-[#5155C3] rounded-md border border-transparent hover:bg-slate-100 transition-colors ml-1 bg-white">
-              <Filter size={16} />
-            </button>
           </div>
 
           {/* Toolbar Row */}
@@ -434,11 +425,6 @@ export default function BudgetView({
                 className={`text-[13px] font-semibold transition-colors flex items-center gap-1.5 ${future.length === 0 ? 'text-slate-400 cursor-not-allowed' : 'text-[#5155C3] hover:text-[#3B42A4]'}`}
               >
                 <Redo2 size={15} /> Redo
-              </button>
-              <button
-                className="text-[13px] font-semibold text-[#5155C3] hover:text-[#3B42A4] transition-colors flex items-center gap-1.5 ml-2"
-              >
-                <History size={15} /> Recent Moves
               </button>
             </div>
 
