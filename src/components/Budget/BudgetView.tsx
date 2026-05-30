@@ -437,29 +437,6 @@ export default function BudgetView({
                   <List size={14} />
                 </button>
               </div>
-
-              <div className="flex items-center bg-[#F4F4F4] rounded-md p-0.5 border border-slate-200">
-                <button
-                  onClick={() => setShowProgressBars(true)}
-                  className={`px-2 py-1 rounded transition-all ${showProgressBars ? 'bg-white shadow-sm text-slate-700' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                  <div className="flex flex-col gap-0.5 items-center justify-center h-3.5 w-3.5">
-                    <div className="w-2.5 h-0.5 bg-current rounded-sm"></div>
-                    <div className="w-2.5 h-0.5 bg-current rounded-sm"></div>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setShowProgressBars(false)}
-                  className={`px-2.5 py-1.5 rounded-md transition-all ${!showProgressBars ? 'bg-white shadow-sm text-slate-700' : 'text-slate-400 hover:text-slate-600'}`}
-                >
-                  <List size={16} />
-                </button>
-              </div>
-
-              {/* Tooltip */}
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity bg-[#1A1A1A] text-white text-xs font-semibold py-1.5 px-3 rounded-md whitespace-nowrap shadow-md z-50">
-                {showProgressBars ? 'Progress Bars On' : 'Progress Bars Off'}
-              </div>
             </div>
           </div>
 
