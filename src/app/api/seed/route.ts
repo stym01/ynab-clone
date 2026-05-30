@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 export async function GET(request: Request) {
   try {
-    const email = 'satyamkesahrwani134@gmail.com';
+    const email = 'satyamkesharwani134@gmail.com';
     let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       console.log('User not found, creating user...');
@@ -18,10 +18,16 @@ export async function GET(request: Request) {
 
     const structure = [
       {
+        name: 'Investing & Wealth',
+        categories: [
+          'Emergency Fund', 'Roth IRA', 'Brokerage / Index Funds', '401(k) / Retirement'
+        ]
+      },
+      {
         name: 'Bills',
         categories: [
           'Mortgage Payment', 'Utilities', 'Pet Insurance', 'Spotify',
-          'Car Insurance', 'Netflix', 'Gym Membership', 'Phone & Internet'
+          'Car Insurance', 'Health Insurance', 'Netflix', 'Gym Membership', 'Phone & Internet'
         ]
       },
       {
@@ -54,8 +60,8 @@ export async function GET(request: Request) {
       {
         name: 'Irregular & Annual',
         categories: [
-          'Home Maintenance', 'Auto Maintenance', 'Vet Medical', 'Medical Emergency',
-          'Life Insurance', 'YNAB Subscription', 'Amazon Prime', 'Gifts (Weddings, Birthdays, Graduations, etc.)'
+          'Home Maintenance', 'Auto Maintenance', 'Next Car / Car Replacement', 'Vet Medical', 'Medical Emergency',
+          'Term Life Insurance', 'YNAB Subscription', 'Amazon Prime', 'Gifts (Weddings, Birthdays, Graduations, etc.)'
         ]
       },
       {
