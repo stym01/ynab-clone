@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -70,6 +70,7 @@ model Budget {
   accounts       FinancialAccount[]
   categoryGroups CategoryGroup[]
   payees         Payee[]
+  monthMeta      MonthMeta[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -201,4 +202,17 @@ model SubTransaction {
   
   amount        Float      // In cents
   memo          String?
+}
+
+model MonthMeta {
+  id        String   @id @default(cuid())
+  budgetId  String
+  budget    Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  month     String   // Format: "YYYY-MM"
+  note      String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([budgetId, month])
 }

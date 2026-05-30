@@ -147,34 +147,84 @@ export default function BudgetTable({
       }
     } else {
       // It's a category drag
-      let groupId = null;
-      let oldIndex = -1;
-      let newIndex = -1;
+      let sourceGroupId = null;
+      let targetGroupId = null;
+      let sourceIndex = -1;
+      let targetIndex = -1;
+
       for (const g of groups) {
         const catIdx = g.categories.findIndex((c: any) => c.id === active.id);
         if (catIdx !== -1) {
-          groupId = g.id;
-          oldIndex = catIdx;
-          newIndex = g.categories.findIndex((c: any) => c.id === over.id);
+          sourceGroupId = g.id;
+          sourceIndex = catIdx;
           break;
         }
       }
 
-      if (groupId && newIndex !== -1) {
-        // Optimistic update
-        setGroups(prev => prev.map(g => {
-          if (g.id === groupId) {
-            return { ...g, categories: arrayMove(g.categories, oldIndex, newIndex) };
+      // Check if dropped on a group header
+      const targetGroupObj = groups.find(g => g.id === over.id);
+      if (targetGroupObj) {
+        targetGroupId = over.id as string;
+        targetIndex = targetGroupObj.categories.length; // Drop at end of group
+      } else {
+        // Dropped on another category
+        for (const g of groups) {
+          const catIdx = g.categories.findIndex((c: any) => c.id === over.id);
+          if (catIdx !== -1) {
+            targetGroupId = g.id;
+            targetIndex = catIdx;
+            break;
           }
-          return g;
-        }));
+        }
+      }
 
-        // Server update
-        const { reorderCategories } = await import("@/app/actions/budget");
-        const group = groups.find(g => g.id === groupId);
-        if (group) {
-          const newCategories = arrayMove(group.categories, oldIndex, newIndex);
-          await reorderCategories(groupId, newCategories.map((c: any) => c.id));
+      if (sourceGroupId && targetGroupId) {
+        if (sourceGroupId === targetGroupId) {
+          // Same group
+          setGroups(prev => prev.map(g => {
+            if (g.id === sourceGroupId) {
+              return { ...g, categories: arrayMove(g.categories, sourceIndex, targetIndex) };
+            }
+            return g;
+          }));
+
+          const { reorderCategories } = await import("@/app/actions/budget");
+          const group = groups.find(g => g.id === sourceGroupId);
+          if (group) {
+            const newCategories = arrayMove(group.categories, sourceIndex, targetIndex);
+            await reorderCategories(sourceGroupId, newCategories.map((c: any) => c.id));
+          }
+        } else {
+          // Cross group
+          let categoryToMove: any = null;
+          let newOrderIds: string[] = [];
+
+          setGroups(prev => {
+            const newGroups = [...prev];
+            const srcGrpIdx = newGroups.findIndex(g => g.id === sourceGroupId);
+            const tgtGrpIdx = newGroups.findIndex(g => g.id === targetGroupId);
+            
+            if (srcGrpIdx !== -1 && tgtGrpIdx !== -1) {
+              const srcGrp = { ...newGroups[srcGrpIdx], categories: [...newGroups[srcGrpIdx].categories] };
+              categoryToMove = srcGrp.categories[sourceIndex];
+              srcGrp.categories.splice(sourceIndex, 1);
+              
+              const tgtGrp = { ...newGroups[tgtGrpIdx], categories: [...newGroups[tgtGrpIdx].categories] };
+              tgtGrp.categories.splice(targetIndex, 0, categoryToMove);
+              
+              newGroups[srcGrpIdx] = srcGrp;
+              newGroups[tgtGrpIdx] = tgtGrp;
+
+              newOrderIds = tgtGrp.categories.map((c: any) => c.id);
+            }
+            return newGroups;
+          });
+
+          if (categoryToMove) {
+            const { moveCategoryToGroup, reorderCategories } = await import("@/app/actions/budget");
+            await moveCategoryToGroup(active.id as string, targetGroupId);
+            await reorderCategories(targetGroupId, newOrderIds);
+          }
         }
       }
     }

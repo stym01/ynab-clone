@@ -369,19 +369,60 @@ export async function updateTransaction(transactionId: string, data: {
     }
   }
 
-  // Handle amount change — adjust account balance
-  if (data.amount !== undefined && data.amount !== transaction.amount) {
-    const diff = data.amount - transaction.amount
-    await prisma.financialAccount.update({
-      where: { id: transaction.accountId },
-      data: { balance: { increment: diff } }
-    })
-    updateData.amount = data.amount
-  }
+  // Find account to check if CC
+  const account = await prisma.financialAccount.findUnique({
+    where: { id: transaction.accountId }
+  })
+  const isCC = account?.type === 'creditCard'
 
-  await prisma.transaction.update({
-    where: { id: transactionId },
-    data: updateData
+  await prisma.$transaction(async (tx) => {
+    // 1. Reverse old CC automation if applicable
+    if (isCC && transaction.amount < 0 && transaction.categoryId) {
+      const ccCategory = await tx.category.findFirst({
+        where: { name: account.name, group: { name: "Credit Card Payments", budgetId: account.budgetId } }
+      })
+      if (ccCategory) {
+        const oldMonthStr = transaction.date.toISOString().substring(0, 7)
+        await tx.monthlyBudget.updateMany({
+          where: { categoryId: ccCategory.id, month: oldMonthStr },
+          data: { assigned: { decrement: Math.abs(transaction.amount) } }
+        })
+      }
+    }
+
+    // Handle amount change — adjust account balance
+    if (data.amount !== undefined && data.amount !== transaction.amount) {
+      const diff = data.amount - transaction.amount
+      await tx.financialAccount.update({
+        where: { id: transaction.accountId },
+        data: { balance: { increment: diff } }
+      })
+      updateData.amount = data.amount
+    }
+
+    await tx.transaction.update({
+      where: { id: transactionId },
+      data: updateData
+    })
+
+    // 2. Apply new CC automation if applicable
+    const newAmount = updateData.amount !== undefined ? updateData.amount : transaction.amount
+    const newDate = updateData.date !== undefined ? updateData.date : transaction.date
+    const newCategoryId = updateData.categoryId !== undefined ? updateData.categoryId : transaction.categoryId
+
+    if (isCC && newAmount < 0 && newCategoryId) {
+      const ccCategory = await tx.category.findFirst({
+        where: { name: account.name, group: { name: "Credit Card Payments", budgetId: account.budgetId } }
+      })
+      if (ccCategory) {
+        const newMonthStr = newDate.toISOString().substring(0, 7)
+        await tx.monthlyBudget.upsert({
+          where: { categoryId_month: { categoryId: ccCategory.id, month: newMonthStr } },
+          update: { assigned: { increment: Math.abs(newAmount) } },
+          create: { categoryId: ccCategory.id, month: newMonthStr, assigned: Math.abs(newAmount) }
+        })
+      }
+    }
   })
 
   revalidatePath("/")

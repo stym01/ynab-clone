@@ -69,6 +69,7 @@ export default async function BudgetPage({ searchParams }: { searchParams: Promi
       totalInflows={initialData?.totalInflows || 0}
       totalAssigned={initialData?.totalAssigned || 0}
       totalOverspending={initialData?.totalOverspending || 0}
+      monthNote={initialData?.monthNote || ""}
     />
   )
 }

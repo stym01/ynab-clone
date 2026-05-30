@@ -17,6 +17,8 @@ interface HeaderProps {
   onAutoAssignUnderfunded?: () => void
   onAutoAssignLastMonth?: () => void
   onResetAssigned?: () => void
+  monthNote?: string
+  budgetId?: string
 }
 
 export default function Header({ 
@@ -27,13 +29,26 @@ export default function Header({
   totalOverspending = 0,
   onAutoAssignUnderfunded,
   onAutoAssignLastMonth,
-  onResetAssigned
+  onResetAssigned,
+  monthNote: initialMonthNote = "",
+  budgetId = ""
 }: HeaderProps) {
   const router = useRouter()
   const [showRTABreakdown, setShowRTABreakdown] = useState(false)
   const [showAutoAssign, setShowAutoAssign] = useState(false)
   const [showMonthNote, setShowMonthNote] = useState(false)
-  const [monthNote, setMonthNote] = useState("")
+  const [monthNote, setMonthNote] = useState(initialMonthNote)
+  
+  useEffect(() => {
+    setMonthNote(initialMonthNote)
+  }, [initialMonthNote])
+
+  const handleNoteBlur = async () => {
+    if (monthNote !== initialMonthNote && budgetId) {
+      const { updateMonthNote } = await import("@/app/actions/budget")
+      await updateMonthNote(budgetId, month, monthNote)
+    }
+  }
   
   const rtaRef = useRef<HTMLDivElement>(null)
   const autoRef = useRef<HTMLDivElement>(null)
@@ -110,17 +125,51 @@ export default function Header({
           <ChevronLeft size={16} strokeWidth={2.5} />
         </button>
         
-        <div 
-          className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
-          onClick={() => setShowMonthDropdown(!showMonthDropdown)}
-        >
-          <div className="flex items-center gap-1">
-            <h1 className="text-[20px] font-bold text-slate-800 text-center select-none tracking-tight">
-              {readableMonth}
-            </h1>
-            <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-0.5" />
+        <div className="relative" ref={noteRef}>
+          <div 
+            className="flex flex-col cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={(e) => {
+              // Only open month dropdown if clicking on the month name, open note if clicking on the note
+              const target = e.target as HTMLElement
+              if (target.closest('.month-note-text')) {
+                setShowMonthNote(!showMonthNote)
+                setShowMonthDropdown(false)
+              } else {
+                setShowMonthDropdown(!showMonthDropdown)
+                setShowMonthNote(false)
+              }
+            }}
+          >
+            <div className="flex items-center gap-1">
+              <h1 className="text-[20px] font-bold text-slate-800 text-center select-none tracking-tight">
+                {readableMonth}
+              </h1>
+              <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-0.5" />
+            </div>
+            <span className="month-note-text text-[12px] text-slate-400 font-medium pl-0.5 max-w-[200px] truncate">
+              {monthNote || "Enter a note..."}
+            </span>
           </div>
-          <span className="text-[12px] text-slate-400 font-medium pl-0.5">Enter a note...</span>
+
+          <AnimatePresence>
+            {showMonthNote && (
+              <motion.div
+                initial={{ opacity: 0, y: -4, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -4, scale: 0.95 }}
+                className="absolute top-full left-0 mt-2 w-72 bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-slate-100 p-3 z-50 origin-top-left"
+              >
+                <textarea
+                  autoFocus
+                  value={monthNote}
+                  onChange={(e) => setMonthNote(e.target.value)}
+                  onBlur={handleNoteBlur}
+                  placeholder="Enter a note for this month..."
+                  className="w-full h-24 p-2 text-sm text-slate-700 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-[#5155C3] focus:ring-1 focus:ring-[#5155C3] resize-none"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <button 

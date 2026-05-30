@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { 
   ChevronDown, ChevronsLeft, ChevronsRight, PieChart, 
   Landmark, Wallet, CreditCard, PiggyBank, Plus, 
-  MoreHorizontal, Archive, Settings, LogOut, Pencil, Trees
+  MoreHorizontal, Archive, Settings, LogOut, Pencil, Trees, Trash2
 } from "lucide-react"
 import { formatCurrency } from "@/lib/currency"
 
@@ -146,17 +146,50 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
                     >
                       <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Switch Budget</div>
                       {budgets.map(b => (
-                        <button 
-                          key={b.id} 
-                          onClick={async () => {
-                            const { switchBudget } = await import("@/app/actions/budget")
-                            await switchBudget(b.id)
-                            setIsBudgetDropdownOpen(false)
-                          }}
-                          className={`w-full text-left px-4 py-2 hover:bg-slate-50 text-sm font-medium ${b.id === activeBudget?.id ? 'text-[#005A87] bg-blue-50' : ''}`}
-                        >
-                          {b.name}
-                        </button>
+                        <div key={b.id} className={`flex items-center justify-between w-full px-4 py-2 hover:bg-slate-50 group/budget ${b.id === activeBudget?.id ? 'bg-blue-50' : ''}`}>
+                          <button 
+                            onClick={async () => {
+                              const { switchBudget } = await import("@/app/actions/budget")
+                              await switchBudget(b.id)
+                              setIsBudgetDropdownOpen(false)
+                            }}
+                            className={`flex-1 text-left text-sm font-medium ${b.id === activeBudget?.id ? 'text-[#005A87]' : 'text-slate-800'}`}
+                          >
+                            {b.name}
+                          </button>
+                          <div className="flex items-center opacity-0 group-hover/budget:opacity-100 transition-opacity gap-1">
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                const newName = window.prompt("Enter new budget name:", b.name);
+                                if (newName && newName !== b.name) {
+                                  const { renameBudget } = await import("@/app/actions/budget");
+                                  await renameBudget(b.id, newName);
+                                }
+                              }}
+                              className="p-1 text-slate-400 hover:text-slate-600 rounded"
+                              title="Rename budget"
+                            >
+                              <Pencil size={12} />
+                            </button>
+                            <button
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                if (window.confirm(`Are you sure you want to delete the budget "${b.name}"? This cannot be undone.`)) {
+                                  const { deleteBudget } = await import("@/app/actions/budget");
+                                  await deleteBudget(b.id);
+                                  if (b.id === activeBudget?.id) {
+                                    setIsBudgetDropdownOpen(false);
+                                  }
+                                }
+                              }}
+                              className="p-1 text-slate-400 hover:text-red-500 rounded"
+                              title="Delete budget"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                        </div>
                       ))}
                       <div className="border-t border-slate-100 mt-1 pt-1">
                         <button 
@@ -403,12 +436,6 @@ export default function Sidebar({ accounts = [], budgets = [], activeBudget = nu
               >
                 <Plus size={16} />
                 Add Account
-              </button>
-              <button 
-                className="w-full py-2 bg-[#33399b] hover:bg-[#3B42A4] text-white rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2"
-              >
-                <Landmark size={16} />
-                Bank Connections
               </button>
             </div>
 
