@@ -550,7 +550,7 @@ export default function BudgetTable({
                                               />
                                             </div>
                                           )}
-                                          {showProgressBars && (
+                                          {showProgressBars && !category.linkedAccountId && (
                                             <div className="h-[4px] bg-[#EAE8E3] rounded-full mt-1 overflow-hidden ml-[22px]" style={{ width: 'calc(100% - 22px)' }}>
                                               {(() => {
                                                 const budget = category.assigned || 0
