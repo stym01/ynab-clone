@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'satyamkesahrwani134@gmail.com';
+  const email = 'satyamkesharwani134@gmail.com';
   let user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     console.log('User not found, creating user...');
@@ -75,7 +75,7 @@ async function main() {
         data: { budgetId: budget.id, name: groupData.name, sortOrder: groupSortOrder }
       });
     }
-    
+
     let catSortOrder = 0;
     for (const catName of groupData.categories) {
       const existingCat = await prisma.category.findFirst({
@@ -90,7 +90,7 @@ async function main() {
     }
     groupSortOrder++;
   }
-  
+
   console.log('Successfully created all categories!');
 }
 
