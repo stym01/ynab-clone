@@ -20,16 +20,19 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
     setIsSubmitting(true)
     try {
       const balanceCents = Math.round(parseFloat(balance || "0") * 100)
-      
+
       let actualType = type
       let syncProvider: string | undefined = undefined
-      
+
       if (type.startsWith("kotak_sms_")) {
         actualType = "checking" // Default to checking for Kotak, or could be savings
         const tail = type.replace("kotak_sms_", "")
         syncProvider = `KOTAK_SMS_${tail}`
+      } else if (type === "ICICI_SMS") {
+        actualType = "creditCard"
+        syncProvider = "ICICI_SMS"
       }
-      
+
       await createAccount(name, actualType, balanceCents, syncProvider)
       onClose()
     } catch (err) {
@@ -39,13 +42,13 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
   }
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
     >
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.95, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -58,25 +61,25 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
             <X size={20} />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-slate-600">Nickname</label>
-            <input 
+            <input
               required
               autoFocus
-              type="text" 
+              type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Chase Checking"
               className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent transition-shadow"
             />
           </div>
-          
+
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-slate-600">Account Type / Sync</label>
-            <select 
-              value={type.startsWith("kotak_sms") ? "kotak_sms" : type} 
+            <select
+              value={type.startsWith("kotak_sms") ? "kotak_sms" : type}
               onChange={e => {
                 if (e.target.value === "kotak_sms") {
                   setType("kotak_sms_")
@@ -89,16 +92,16 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
               <option value="checking">Checking (Manual)</option>
               <option value="savings">Savings (Manual)</option>
               <option value="creditCard">Credit Card (Manual)</option>
-              <option value="icici_credit">ICICI Credit Card (Gmail Auto-Sync)</option>
+              <option value="ICICI_SMS">ICICI Credit Card (SMS Auto-Sync)</option>
               <option value="kotak_sms">Kotak Mahindra Bank (SMS Auto-Sync)</option>
             </select>
-            
+
             {type.startsWith("kotak_sms") && (
               <div className="mt-2 flex flex-col gap-1.5 p-3 bg-slate-50 rounded-md border border-slate-200">
                 <label className="text-xs font-semibold text-slate-600">Account Tail (Last 4 Digits)</label>
-                <input 
+                <input
                   required
-                  type="text" 
+                  type="text"
                   placeholder="e.g. 6065"
                   value={type.replace("kotak_sms_", "")}
                   onChange={e => setType(`kotak_sms_${e.target.value}`)}
@@ -107,14 +110,14 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
               </div>
             )}
           </div>
-          
+
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-slate-600">Current Balance</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-medium">₹</span>
-              <input 
+              <input
                 required
-                type="number" 
+                type="number"
                 step="0.01"
                 value={balance}
                 onChange={e => setBalance(e.target.value)}
@@ -124,17 +127,17 @@ export default function AddAccountModal({ onClose }: AddAccountModalProps) {
             </div>
             <p className="text-xs text-slate-500 mt-1">If you owe money, enter a negative amount.</p>
           </div>
-          
+
           <div className="flex justify-end gap-3 mt-2 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              onClick={onClose} 
+            <button
+              type="button"
+              onClick={onClose}
               className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
             >
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isSubmitting}
               className="px-4 py-2 text-sm font-medium text-white bg-[#005a70] hover:bg-[#004758] rounded-md transition-colors shadow-sm disabled:opacity-70 flex items-center gap-2"
             >

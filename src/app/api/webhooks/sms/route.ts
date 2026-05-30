@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       console.error("SMS_WEBHOOK_SECRET is not set in environment");
       return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 });
     }
-    
+
     if (secret !== process.env.SMS_WEBHOOK_SECRET) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -58,8 +58,8 @@ export async function POST(request: Request) {
     }
 
     // Deduplication check
-    const startOfDay = new Date(parsed.date); startOfDay.setHours(0,0,0,0);
-    const endOfDay = new Date(parsed.date); endOfDay.setHours(23,59,59,999);
+    const startOfDay = new Date(parsed.date); startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(parsed.date); endOfDay.setHours(23, 59, 59, 999);
 
     const existing = await prisma.transaction.findFirst({
       where: {

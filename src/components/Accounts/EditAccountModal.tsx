@@ -110,7 +110,7 @@ export default function EditAccountModal({ account, onClose }: EditAccountModalP
               className="px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#005a70] focus:border-transparent bg-white"
             >
               <option value="none">Unlinked (Manual entry only)</option>
-              <option value="ICICI_GMAIL">ICICI Credit Card (Gmail Sync)</option>
+              <option value="ICICI_SMS">ICICI Credit Card (SMS Sync)</option>
               <option value="KOTAK_SMS">Kotak Mahindra Bank (SMS Sync)</option>
             </select>
             

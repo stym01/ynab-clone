@@ -4,40 +4,24 @@ import prisma from "@/lib/prisma"
 import { requireUser } from "@/lib/session"
 import { revalidatePath } from "next/cache"
 import { cookies } from "next/headers"
-import { enableGmailWatch } from "./bankSync"
 
 export async function createAccount(name: string, type: string, startingBalanceCents: number, syncProvider?: string) {
   const user = await requireUser()
   const budget = await prisma.budget.findFirst({ where: { userId: user.id } })
   if (!budget) throw new Error("No budget found")
 
-  const isICICI = type === "icici_credit"
-  const actualType = isICICI ? "creditCard" : type
-  
-  const finalSyncProvider = syncProvider || (isICICI ? "ICICI_GMAIL" : null)
-
   // Create account
   const account = await prisma.financialAccount.create({
     data: {
       budgetId: budget.id,
       name,
-      type: actualType,
+      type: type,
       balance: startingBalanceCents,
-      syncProvider: finalSyncProvider
+      syncProvider: syncProvider || null
     }
   })
-
-  if (isICICI) {
-    try {
-      // Use the user's specific Pub/Sub topic for the push notification
-      await enableGmailWatch(account.id, "projects/gen-lang-client-0222112657/topics/gmail-push")
-    } catch (e) {
-      console.error("Failed to automatically enable Gmail watch:", e)
-    }
-  }
-
   // If Credit Card, create the "Credit Card Payments" group and a category for this card
-  if (actualType === "creditCard") {
+  if (type === "creditCard") {
     let ccGroup = await prisma.categoryGroup.findFirst({
       where: { budgetId: budget.id, name: "Credit Card Payments" }
     })
@@ -446,13 +430,7 @@ export async function updateAccount(accountId: string, name: string, syncProvide
     data: { name, syncProvider }
   })
 
-  if (syncProvider === "ICICI_GMAIL") {
-    try {
-      await enableGmailWatch(accountId, "projects/gen-lang-client-0222112657/topics/gmail-push")
-    } catch (e) {
-      console.error("Failed to enable Gmail watch:", e)
-    }
-  }
+
 
   revalidatePath("/")
 }
