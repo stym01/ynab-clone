@@ -98,16 +98,16 @@ export default function Header({
   const rtaPositive = readyToAssign >= 0
 
   return (
-    <header className="h-[90px] bg-white border-b border-slate-200 flex items-center px-6 flex-shrink-0 shadow-sm relative z-20">
+    <header className="h-[75px] bg-white border-b border-slate-200 flex items-center px-6 flex-shrink-0 shadow-sm relative z-20">
       
       {/* Left: Month Selector + Notes */}
       <div className="flex items-center gap-4 relative flex-1" ref={monthDropdownRef}>
         <button 
           onClick={handlePrevMonth} 
-          className="p-1 text-[#5155C3] hover:bg-slate-50 rounded transition-all active:scale-95"
+          className="flex items-center justify-center w-[26px] h-[26px] rounded-full border-[1.5px] border-[#5155C3] text-[#5155C3] hover:bg-[#EEF2FC] transition-colors active:scale-95"
           aria-label="Previous month"
         >
-          <ChevronLeft size={20} strokeWidth={2.5} />
+          <ChevronLeft size={16} strokeWidth={2.5} />
         </button>
         
         <div 
@@ -115,20 +115,20 @@ export default function Header({
           onClick={() => setShowMonthDropdown(!showMonthDropdown)}
         >
           <div className="flex items-center gap-1">
-            <h1 className="text-[22px] font-bold text-slate-800 text-center select-none tracking-tight">
+            <h1 className="text-[20px] font-bold text-slate-800 text-center select-none tracking-tight">
               {readableMonth}
             </h1>
-            <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-1" />
+            <ChevronDown size={14} strokeWidth={3} className="text-[#5155C3] mt-0.5" />
           </div>
-          <span className="text-[13px] text-slate-500 font-medium pl-1">Enter a note...</span>
+          <span className="text-[12px] text-slate-400 font-medium pl-0.5">Enter a note...</span>
         </div>
 
         <button 
           onClick={handleNextMonth} 
-          className="p-1 text-[#5155C3] hover:bg-slate-50 rounded transition-all active:scale-95"
+          className="flex items-center justify-center w-[26px] h-[26px] rounded-full border-[1.5px] border-[#5155C3] text-[#5155C3] hover:bg-[#EEF2FC] transition-colors active:scale-95"
           aria-label="Next month"
         >
-          <ChevronRight size={20} strokeWidth={2.5} />
+          <ChevronRight size={16} strokeWidth={2.5} />
         </button>
 
         {/* Month Dropdown Popover */}
